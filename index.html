@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Separação Full</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="titulo"><h1>Sistema de controle - Mercado Livre Full</h1></div>
+
+    <div class="container">
+        <nav class="menu">
+            <button class="tab-link" data-tab="itens" onclick="showTab('itens')">Itens</button>
+            <button class="tab-link" data-tab="kits" onclick="showTab('kits')">Kits</button>
+            <button class="tab-link" data-tab="consulta" onclick="showTab('consulta')">Consulta</button>
+            <button class="tab-link" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
+            <button class="tab-link" data-tab="importar" onclick="showTab('importar')">Importar</button>
+        </nav>
+
+        <!-- Aba Itens -->
+        <div id="itens" class="tab-content">
+            <p>Gerenciamento de Itens</p>
+            <button id="cadastroProduto" onclick="openPopUp()"> + Novo Produto </button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sku</th>
+                        <th>Nome Produto</th>
+                        <th>Código Full</th>
+                        <th>Localização</th>
+                        <th>Estoque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <!-- Linhas da tabela inseridas aqui pelo JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Outras abas -->
+        <div id="kits" class="tab-content" style="display:none;">
+            <p>Gerenciamento de Kits</p>
+        </div>
+
+        <div id="consulta" class="tab-content" style="display:none;">
+            <p>Consultas</p>
+        </div>
+
+        <div id="relatorios" class="tab-content" style="display:none;">
+            <p>Emitir Relatórios</p>
+        </div>
+
+        <div id="importar" class="tab-content" style="display:none;">
+            <p>Importar Dados dos Produtos</p>
+        </div>
+
+        <!-- Popup de Cadastro de Produto -->
+        <div id="popupCadastroItem" class="popUp">
+            <div class="popUp-content">
+                <span class="close" onclick="closePopup()">&times;</span> <!-- Fechar popup -->
+                <h2>Adicionar Novo Produto</h2>
+                <form id="newItemForm">
+                    <label for="sku">SKU:</label>
+                    <input type="text" id="sku" name="sku" required>
+
+                    <label for="nomeProduto">Nome do Produto:</label>
+                    <input type="text" id="nomeProduto" name="nomeProduto" required>
+
+                    <label for="codigoFull">Código Full:</label>
+                    <input type="text" id="codigoFull" name="codigoFull" required>
+
+                    <label for="localizacao">Localização:</label>
+                    <input type="text" id="localizacao" name="localizacao" required>
+
+                    <label for="estoque">Estoque:</label>
+                    <input type="number" id="estoque" name="estoque" required>
+
+                    
+                    <div><button type="button" onclick="closePopup()" id="cancelCadastro">Cancelar</button>
+                    <button type="submit" id="addProduto">Adicionar Produto</button> </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

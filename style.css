@@ -1,0 +1,160 @@
+/* Estilos gerais */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo do menu de navegação */
+.menu {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background-color: #636363;
+    padding: 5px;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    background-color: #0000008f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.tab-link:hover {
+    background-color: #848484;
+}
+
+/* Estilo para as abas */
+.tab-content {
+    display: none; /* Todas as abas começam ocultas */
+    padding: 20px;
+}
+
+#itens {
+    display: block; /* Exibe a aba "itens" por padrão */
+}
+
+/* Estilo do Popup */
+.popUp {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popUp-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 400px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: black;
+}
+
+/* Estilos para o formulário */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #2980b9;
+}
+
+/* Estilos para a tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+#cancelCadastro {
+  background-color: #d1d1d1;
+  padding: 10px;
+  font-size: 16px;
+  color: black;
+}
+
+#addProduto {
+  background-color: #000000;
+  padding: 10px;
+  font-size: 16px;
+  color: white;
+}
+
+#cadastroProduto{
+    border-bottom: 10px;
+}
+
+button{
+    padding: 10px 20px;
+    background-color: #000000c9;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    gap: 10px;
+}
+
+.btn-editar{
+    background-color: #636363c9;
+    padding: 10px 20px;
+    border: none;
+    gap: 10px;
+}
+
+.btn-excluir{
+    background-color: #ff0000c9;
+    padding: 10px 20px;
+    border: none;
+    gap: 10px;
+}
