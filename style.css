@@ -41,7 +41,7 @@ body {
 .popUp {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -81,7 +81,7 @@ form label {
     font-weight: bold;
 }
 
-form input {
+form input, form textarea {
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -118,24 +118,38 @@ th {
 }
 
 #cancelCadastro {
-  background-color: #d1d1d1;
-  padding: 10px;
-  font-size: 16px;
-  color: black;
+    background-color: #d1d1d1;
+    padding: 10px;
+    font-size: 16px;
+    color: black;
+}
+
+#cancelKit {
+    background-color: #d1d1d1;
+    padding: 10px;
+    font-size: 16px;
+    color: black;
 }
 
 #addProduto {
-  background-color: #000000;
-  padding: 10px;
-  font-size: 16px;
-  color: white;
+    background-color: #000000;
+    padding: 10px;
+    font-size: 16px;
+    color: white;
 }
 
-#cadastroProduto{
+#addKit {
+    background-color: #000000;
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+}
+
+#cadastroProduto, #cadastroKit {
     border-bottom: 10px;
 }
 
-button{
+button {
     padding: 10px 20px;
     background-color: #000000c9;
     color: white;
@@ -145,16 +159,28 @@ button{
     gap: 10px;
 }
 
-.btn-editar{
+.btn-editar {
     background-color: #636363c9;
     padding: 10px 20px;
     border: none;
     gap: 10px;
 }
 
-.btn-excluir{
+.btn-excluir {
     background-color: #ff0000c9;
     padding: 10px 20px;
     border: none;
     gap: 10px;
+}
+
+#toggleProdutosKit {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+#listaProdutosKit {
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
 }

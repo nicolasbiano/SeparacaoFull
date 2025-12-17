@@ -1,140 +1,203 @@
-// Função para abrir o popup
+/* ===================== DADOS ===================== */
+
+let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+let kits = JSON.parse(localStorage.getItem("kits")) || [];
+let editingRow = null;
+
+/* ===================== ABAS ===================== */
+
+function showTab(tabId) {
+    document.querySelectorAll(".tab-content").forEach(tab => {
+        tab.style.display = "none";
+    });
+    document.getElementById(tabId).style.display = "block";
+}
+
+/* ===================== POPUP PRODUTO ===================== */
+
 function openPopUp() {
     document.getElementById("popupCadastroItem").style.display = "block";
 }
 
-// Função para fechar o popup
 function closePopup() {
     document.getElementById("popupCadastroItem").style.display = "none";
+    document.getElementById("newItemForm").reset();
+    editingRow = null;
 }
 
-// Fechar o popup ao clicar fora da janela de conteúdo (opcional)
-window.onclick = function(event) {
-    var modal = document.getElementById("popupCadastroItem");
-    if (event.target == modal) {
-        closePopup();
-    }
+/* ===================== POPUP KIT ===================== */
+
+function openKitPopUp() {
+    document.getElementById("popupCadastroKit").style.display = "block";
+    carregarProdutosNoKit();
 }
 
-// Variável para armazenar a linha que está sendo editada
-let editingRow = null;
+function closeKitPopUp() {
+    document.getElementById("popupCadastroKit").style.display = "none";
+    document.getElementById("newKitForm").reset();
+    document.getElementById("listaProdutosKit").innerHTML = "";
+}
 
-// Lógica para enviar o formulário e adicionar o produto à tabela
-document.getElementById("newItemForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Previne o envio do formulário e recarregamento da página
+/* ===================== INIT ===================== */
 
-    const sku = document.getElementById("sku").value;
-    const nomeProduto = document.getElementById("nomeProduto").value;
-    const codigoFull = document.getElementById("codigoFull").value;
-    const localizacao = document.getElementById("localizacao").value;
-    const estoque = parseInt(document.getElementById("estoque").value);
+document.addEventListener("DOMContentLoaded", () => {
+    showTab("itens");
+    renderProdutos();
+    renderKits();
 
-    const table = document.getElementById("productTableBody");
+    document
+        .getElementById("newItemForm")
+        .addEventListener("submit", salvarProduto);
 
-    if (editingRow) {
-        // Se estiver editando, atualiza a linha existente
-        const cells = editingRow.getElementsByTagName("td");
-        cells[1].textContent = nomeProduto;
-        cells[2].textContent = codigoFull;
-        cells[3].textContent = localizacao;
-        cells[4].textContent = estoque;
-
-        console.log(`Produto editado: SKU ${sku} -> Estoque: ${estoque}`);
-
-        editingRow = null; // Limpa a linha de edição após salvar
-
-    } else {
-        // Se não estiver editando, adiciona um novo produto
-        const newRow = document.createElement("tr");
-
-        // Cria as células e atribui os valores
-        const cellSKU = document.createElement("td");
-        cellSKU.textContent = sku;
-
-        const cellNomeProduto = document.createElement("td");
-        cellNomeProduto.textContent = nomeProduto;
-
-        const cellCodigoFull = document.createElement("td");
-        cellCodigoFull.textContent = codigoFull;
-
-        const cellLocalizacao = document.createElement("td");
-        cellLocalizacao.textContent = localizacao;
-
-        const cellEstoque = document.createElement("td");
-        cellEstoque.textContent = estoque;
-
-        // Cria a célula de ações com botões de Editar e Excluir
-        const cellAcoes = document.createElement("td");
-        const editButton = document.createElement("button");
-        editButton.textContent = "Editar";
-        editButton.classList.add("btn-editar");
-        editButton.addEventListener("click", function() {
-            editProduct(newRow);
-        });
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Excluir";
-        deleteButton.classList.add("btn-excluir");
-        deleteButton.addEventListener("click", function() {
-            deleteProduct(newRow);
-        });
-
-        cellAcoes.appendChild(editButton);
-        cellAcoes.appendChild(deleteButton);
-
-        // Adiciona as células à nova linha
-        newRow.appendChild(cellSKU);
-        newRow.appendChild(cellNomeProduto);
-        newRow.appendChild(cellCodigoFull);
-        newRow.appendChild(cellLocalizacao);
-        newRow.appendChild(cellEstoque);
-        newRow.appendChild(cellAcoes);
-
-        // Adiciona a nova linha à tabela
-        table.appendChild(newRow);
-
-        console.log(`Produto Adicionado: SKU ${sku} - Estoque: ${estoque}`);
-    }
-
-    closePopup(); // Fecha o popup após o envio
-    document.getElementById("newItemForm").reset(); // Resetar o formulário após a adição
+    document
+        .getElementById("newKitForm")
+        .addEventListener("submit", salvarKit);
 });
 
-// Função para editar o produto
-function editProduct(row) {
-    const cells = row.getElementsByTagName("td");
+/* ===================== PRODUTOS ===================== */
 
-    // Preenche o formulário com dados da linha (não alteramos o SKU)
-    document.getElementById("sku").value = cells[0].textContent; // SKU é mantido
-    document.getElementById("nomeProduto").value = cells[1].textContent;
-    document.getElementById("codigoFull").value = cells[2].textContent;
-    document.getElementById("localizacao").value = cells[3].textContent;
-    document.getElementById("estoque").value = cells[4].textContent;
+function salvarProduto(e) {
+    e.preventDefault();
 
-    openPopUp(); // Abre o popup para editar
+    const produto = {
+        sku: sku.value.trim(),
+        nome: nomeProduto.value.trim(),
+        codigo: codigoFull.value.trim(),
+        local: localizacao.value.trim(),
+        estoque: Number(estoque.value)
+    };
 
-    // Marca a linha como "em edição"
-    editingRow = row;
+    if (!produto.sku || !produto.nome) return;
+
+    produtos.push(produto);
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+
+    renderProdutos();
+    closePopup();
 }
 
-// Função para excluir o produto
-function deleteProduct(row) {
-    row.remove(); // Remove a linha da tabela
-    console.log("Produto excluído.");
+function renderProdutos() {
+    const tbody = document.getElementById("productTableBody");
+    tbody.innerHTML = "";
+
+    produtos.forEach((p, index) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${p.sku}</td>
+            <td>${p.nome}</td>
+            <td>${p.codigo}</td>
+            <td>${p.local}</td>
+            <td>${p.estoque}</td>
+            <td>
+                <button onclick="excluirProduto(${index})">Excluir</button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
 
-// Exibir somente a aba selecionada
-function showTab(tabName) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => {
-        tab.style.display = 'none'; // Esconde as abas
+function excluirProduto(index) {
+    produtos.splice(index, 1);
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+    renderProdutos();
+}
+
+/* ===================== KITS ===================== */
+
+function carregarProdutosNoKit() {
+    const container = document.getElementById("listaProdutosKit");
+    container.innerHTML = "";
+
+    produtos.forEach(prod => {
+        if (prod.estoque <= 0) return;
+
+        const linha = document.createElement("div");
+        linha.className = "linha-kit";
+
+        linha.innerHTML = `
+            <select class="produto-kit">
+                <option value="">Selecione um item</option>
+                <option value="${prod.sku}">
+                    ${prod.sku} - ${prod.nome} (Estoque: ${prod.estoque})
+                </option>
+            </select>
+
+            <input type="number" class="qtd-kit" min="1" value="1">
+        `;
+
+        container.appendChild(linha);
+    });
+}
+
+function salvarKit(e) {
+    e.preventDefault();
+
+    const itens = [];
+    const linhas = document.querySelectorAll(".linha-kit");
+
+    linhas.forEach(linha => {
+        const sku = linha.querySelector(".produto-kit").value;
+        const qtd = Number(linha.querySelector(".qtd-kit").value);
+
+        if (sku && qtd > 0) {
+            itens.push({ sku, qtd });
+        }
     });
 
-    const activeTab = document.getElementById(tabName);
-    if (activeTab) {
-        activeTab.style.display = 'block'; // Mostra a aba selecionada
+    if (!itens.length) {
+        alert("Selecione ao menos um produto");
+        return;
     }
+
+    // valida estoque
+    for (let item of itens) {
+        const prod = produtos.find(p => p.sku === item.sku);
+        if (!prod || prod.estoque < item.qtd) {
+            alert(`Estoque insuficiente para o produto ${item.sku}`);
+            return;
+        }
+    }
+
+    // baixa estoque
+    itens.forEach(item => {
+        const prod = produtos.find(p => p.sku === item.sku);
+        prod.estoque -= item.qtd;
+    });
+
+    const kit = {
+        sku: kitSku.value.trim(),
+        nome: nomeKit.value.trim(),
+        codigo: kitCodigoFull.value.trim(),
+        itens
+    };
+
+    kits.push(kit);
+
+    localStorage.setItem("kits", JSON.stringify(kits));
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+
+    renderProdutos();
+    renderKits();
+    closeKitPopUp();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    showTab('itens'); // Exibe a aba "itens" por padrão
-});
+function renderKits() {
+    const tbody = document.getElementById("kitTableBody");
+    tbody.innerHTML = "";
+
+    kits.forEach(kit => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${kit.sku}</td>
+            <td>${kit.nome}</td>
+            <td>${kit.codigo || "-"}</td>
+            <td>-</td>
+            <td>-</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}

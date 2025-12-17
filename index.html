@@ -16,9 +16,12 @@
         <nav class="menu">
             <button class="tab-link" data-tab="itens" onclick="showTab('itens')">Itens</button>
             <button class="tab-link" data-tab="kits" onclick="showTab('kits')">Kits</button>
-            <button class="tab-link" data-tab="consulta" onclick="showTab('consulta')">Consulta</button>
+            <button class="tab-link" data-tab="separacao" onclick="showTab('separacao')">Separação</button>
             <button class="tab-link" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
             <button class="tab-link" data-tab="importar" onclick="showTab('importar')">Importar</button>
+            <a href="https://nicolasbiano.github.io/leitorcodigosfull/" target="_blank">
+                <button class="tab-link" id="Contador Itens">Contador Itens Full</button>
+            </a>
         </nav>
 
         <!-- Aba Itens -->
@@ -42,27 +45,10 @@
             </table>
         </div>
 
-        <!-- Outras abas -->
-        <div id="kits" class="tab-content" style="display:none;">
-            <p>Gerenciamento de Kits</p>
-        </div>
-
-        <div id="consulta" class="tab-content" style="display:none;">
-            <p>Consultas</p>
-        </div>
-
-        <div id="relatorios" class="tab-content" style="display:none;">
-            <p>Emitir Relatórios</p>
-        </div>
-
-        <div id="importar" class="tab-content" style="display:none;">
-            <p>Importar Dados dos Produtos</p>
-        </div>
-
         <!-- Popup de Cadastro de Produto -->
         <div id="popupCadastroItem" class="popUp">
             <div class="popUp-content">
-                <span class="close" onclick="closePopup()">&times;</span> <!-- Fechar popup -->
+                <span class="close" onclick="closePopup()">&times;</span>
                 <h2>Adicionar Novo Produto</h2>
                 <form id="newItemForm">
                     <label for="sku">SKU:</label>
@@ -80,12 +66,92 @@
                     <label for="estoque">Estoque:</label>
                     <input type="number" id="estoque" name="estoque" required>
 
-                    
-                    <div><button type="button" onclick="closePopup()" id="cancelCadastro">Cancelar</button>
-                    <button type="submit" id="addProduto">Adicionar Produto</button> </div>
+                    <div>
+                        <button type="button" onclick="closePopup()" id="cancelCadastro">Cancelar</button>
+                        <button type="submit" id="addProduto">Adicionar Produto</button>
+                    </div>
                 </form>
             </div>
         </div>
+
+        <!-- Popup de Cadastro de Kit -->
+<div id="popupCadastroKit" class="popUp">
+    <div class="popUp-content">
+        <span class="close" onclick="closeKitPopUp()">&times;</span>
+
+        <h2>Adicionar Novo Kit</h2>
+
+        <form id="newKitForm">
+            <label for="kitSku">SKU do Kit:</label>
+            <input type="text" id="kitSku" required>
+
+            <label for="nomeKit">Nome do Kit:</label>
+            <input type="text" id="nomeKit" required>
+
+            <label for="kitCodigoFull">Código Full:</label>
+            <input type="text" id="kitCodigoFull">
+
+            <label>Itens do Kit</label>
+
+            <div class="kit-selector">
+                <select id="selectProduto">
+                    <option value="">Selecione um item</option>
+                </select>
+
+                <input type="number" id="qtdProdutoKit" value="1" min="1">
+
+                <button type="button" onclick="adicionarProdutoKit()">+</button>
+            </div>
+
+            <div id="itensSelecionadosKit"></div>
+
+            <div id="listaProdutosKit" style="display: none;"></div>
+
+
+            <div>
+                <button type="button" onclick="closeKitPopUp()" id="cancelKit">Cancelar</button>
+                <button type="submit" id="addKit">Salvar Kit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+           <!-- Aba Kits -->
+        <div id="kits" class="tab-content" style="display: none;">
+            <p>Gerenciamento de Kits</p>
+            <button id="cadastroKit" onclick="openKitPopUp()"> + Novo Kit </button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sku</th>
+                        <th>Nome Kit</th>
+                        <th>Código Full</th>
+                        <th>Estoque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="kitTableBody">
+                    <!-- Linhas da tabela inseridas aqui pelo JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Aba Separação -->
+        <div id="separacao" class="tab-content" style="display: none;">
+            <p>Separação</p>
+        </div>
+
+        <!-- Aba Relatórios -->
+        <div id="relatorios" class="tab-content" style="display: none;">
+            <p>Relatórios</p>
+        </div>
+
+        <!-- Aba Importar -->
+        <div id="importar" class="tab-content" style="display: none;">
+            <p>Importar</p>
+        </div>
+
     </div>
 
     <script src="script.js"></script>
