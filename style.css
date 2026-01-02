@@ -56,6 +56,8 @@ body {
     border-radius: 5px;
     width: 80%;
     max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .close {
@@ -115,6 +117,26 @@ th, td {
 
 th {
     background-color: #f4f4f4;
+}
+
+/* Styles for separation table */
+.kit-row {
+    background-color: #e8f4fd;
+    font-weight: bold;
+}
+
+.product-row {
+    background-color: #f9f9f9;
+    padding-left: 20px;
+}
+
+.product-row td:first-child {
+    padding-left: 30px;
+}
+
+.separator-row {
+    background-color: #f0f0f0;
+    font-weight: bold;
 }
 
 #cancelCadastro {
@@ -183,4 +205,196 @@ button {
     padding: 10px;
     max-height: 200px;
     overflow-y: auto;
+}
+
+footer{
+    display: flex;
+    justify-content: center;
+    margin-top:auto;
+    width: 100%;
+    font-size: 15px;
+    color: #0000008e;
+    font-size: 12px;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Print styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #separacaoTable, #separacaoTable * {
+        visibility: visible;
+    }
+    #separacaoTable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    #relatorioTable, #relatorioTable * {
+        visibility: visible;
+    }
+    #relatorioTitle {
+        display: none;
+    }
+    #relatorioTable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .kit-row {
+        background-color: #e8f4fd !important;
+        -webkit-print-color-adjust: exact;
+    }
+    .product-row {
+        background-color: #f9f9f9 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    .separator-row {
+        background-color: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    button {
+        display: none;
+    }
+}
+
+/* Estilo para o seletor de separação */
+.separacao-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.separacao-selector input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.separacao-selector input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.separacao-selector input[type="number"] {
+    width: 80px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+.separacao-selector button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.separacao-selector button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para o seletor de kit */
+.kit-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.kit-selector input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.kit-selector input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.kit-selector input[type="number"] {
+    width: 80px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+.kit-selector button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.kit-selector button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para itens selecionados do kit */
+#itensSelecionadosKit {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.kit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.kit-item-info {
+    flex: 1;
+}
+
+.kit-item-info strong {
+    color: #333;
+    font-size: 16px;
+}
+
+.kit-item-info span {
+    color: #666;
+    font-size: 14px;
+}
+
+.kit-item-remove {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.kit-item-remove:hover {
+    background-color: #c82333;
 }

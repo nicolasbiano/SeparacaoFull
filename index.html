@@ -27,6 +27,7 @@
         <!-- Aba Itens -->
         <div id="itens" class="tab-content">
             <p>Gerenciamento de Itens</p>
+            <input type="text" id="searchProdutos" placeholder="Buscar produtos...">
             <button id="cadastroProduto" onclick="openPopUp()"> + Novo Produto </button>
             <table>
                 <thead>
@@ -91,12 +92,15 @@
             <label for="kitCodigoFull">Código Full:</label>
             <input type="text" id="kitCodigoFull">
 
+            <label for="quantidadeKit">Quantidade:</label>
+            <input type="number" id="quantidadeKit" min="1" value="1">
+
             <label>Itens do Kit</label>
 
             <div class="kit-selector">
-                <select id="selectProduto">
-                    <option value="">Selecione um item</option>
-                </select>
+                <input type="text" id="inputProdutoKit" list="datalistProdutosKit" placeholder="Buscar produto">
+                <datalist id="datalistProdutosKit">
+                </datalist>
 
                 <input type="number" id="qtdProdutoKit" value="1" min="1">
 
@@ -120,14 +124,15 @@
            <!-- Aba Kits -->
         <div id="kits" class="tab-content" style="display: none;">
             <p>Gerenciamento de Kits</p>
-            <button id="cadastroKit" onclick="openKitPopUp()"> + Novo Kit </button>
+            <input type="text" id="searchKits" placeholder="Buscar kits...">
+            <button id="cadastroKit" onclick="openKitPopup()"> + Novo Kit </button>
             <table>
                 <thead>
                     <tr>
                         <th>Sku</th>
                         <th>Nome Kit</th>
                         <th>Código Full</th>
-                        <th>Estoque</th>
+                        <th>Quantidade</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -139,20 +144,65 @@
 
         <!-- Aba Separação -->
         <div id="separacao" class="tab-content" style="display: none;">
-            <p>Separação</p>
+            <p>Separação de Produtos</p>
+            <div class="separacao-selector">
+                <input type="text" id="inputSeparacao" list="datalistSeparacao" placeholder="Buscar e selecionar kit ou produto">
+                <datalist id="datalistSeparacao">
+                </datalist>
+                <input type="number" id="qtdSeparacao" value="1" min="1">
+                <button type="button" onclick="adicionarSeparacao()">Adicionar</button>
+            </div>
+            <table id="separacaoTable">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Código Full</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="separacaoTableBody">
+                </tbody>
+            </table>
         </div>
 
         <!-- Aba Relatórios -->
         <div id="relatorios" class="tab-content" style="display: none;">
             <p>Relatórios</p>
+            <button type="button" onclick="gerarRelatorioProdutos()">Gerar Relatório de Produtos</button>
+            <button type="button" onclick="window.print()">Imprimir Relatório</button>
+            <div id="relatorioTitle" style="display: none; text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0;"></div>
+            <table id="relatorioTable">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Nome</th>
+                        <th>Localização</th>
+                        <th>Quantidade Total</th>
+                        <th>Separado</th>
+                    </tr>
+                </thead>
+                <tbody id="relatorioTableBody">
+                </tbody>
+            </table>
         </div>
 
         <!-- Aba Importar -->
         <div id="importar" class="tab-content" style="display: none;">
-            <p>Importar</p>
+            <p>Importar Produtos</p>
+            <p>Use a planilha modelo para facilitar o preenchimento.</p>
+            <button type="button" id="downloadTemplateButton">Baixar Modelo CSV</button><br><br>
+            <input type="file" id="csvFileInput" accept=".csv"><br><br>
+            <button type="button" id="uploadButton">Upload e Importar</button>
+            <div id="importStatus"></div>
         </div>
 
     </div>
+
+    <footer>
+        <section id="direitos"> © 2025 Nicolas Biano Luvisuto. Todos os direitos reservados.</section>
+    </footer>
 
     <script src="script.js"></script>
 </body>
