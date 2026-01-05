@@ -10,16 +10,24 @@ let produtosSeparacao = [];
 
 /* ===================== ABAS ===================== */
 
-function showTab(tabId) {
+function showTab(tabId, button = null) {
     document.querySelectorAll(".tab-content").forEach(tab => {
         tab.style.display = "none";
     });
+
     document.getElementById(tabId).style.display = "block";
 
-    if (tabId === 'separacao') {
-        populateDatalistSeparacao();
+    document.querySelectorAll(".tab-link").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    if (button) {
+        button.classList.add("active");
     }
 }
+
+
+
 
 /* ===================== POPUP PRODUTO ===================== */
 
@@ -36,9 +44,13 @@ function closePopup() {
 /* ===================== POPUP KIT ===================== */
 
 function openKitPopUp() {
-    document.getElementById("popupCadastroKit").style.display = "block";
+    editingKitRow = null;
     itensKit = [];
+    document.getElementById("newKitForm").reset();
     renderItensSelecionados();
+    populateDatalistProdutosKit();
+    document.getElementById("popupCadastroKit").style.display = "block";
+
 
     const select = document.getElementById("selectProduto");
     select.innerHTML = '<option value="">Selecione um item</option>';
@@ -109,14 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showTab("itens");
     renderProdutos();
     renderKits();
-
-    document
-        .getElementById("newItemForm")
-        .addEventListener("submit", salvarProduto);
-
-    document
-        .getElementById("newKitForm")
-        .addEventListener("submit", salvarKit);
 });
 
 /* ===================== PRODUTOS ===================== */
@@ -223,9 +227,7 @@ function carregarProdutosNoKit() {
 function salvarKit(e) {
     e.preventDefault();
 
-    const itens = itensKit;
-
-    if (!itens.length) {
+    if (!itensKit.length) {
         alert("Selecione ao menos um produto");
         return;
     }
@@ -235,7 +237,7 @@ function salvarKit(e) {
         nome: nomeKit.value.trim(),
         codigo: kitCodigoFull.value.trim(),
         quantidade: Number(quantidadeKit.value) || 1,
-        itens
+        itens: itensKit
     };
 
     if (editingKitRow !== null) {
@@ -245,8 +247,6 @@ function salvarKit(e) {
     }
 
     localStorage.setItem("kits", JSON.stringify(kits));
-
-    renderProdutos();
     renderKits();
     closeKitPopUp();
 }
@@ -255,23 +255,25 @@ function renderKits(filter = '') {
     const tbody = document.getElementById("kitTableBody");
     tbody.innerHTML = "";
 
-    const filteredKits = filter ? kits.filter(kit => 
-        kit.sku.toLowerCase().includes(filter) || 
-        kit.nome.toLowerCase().includes(filter) || 
-        (kit.codigo && kit.codigo.toLowerCase().includes(filter))
-    ) : kits;
+    const filteredKits = filter
+        ? kits.map((kit, index) => ({ kit, index }))
+              .filter(obj =>
+                  obj.kit.sku.toLowerCase().includes(filter) ||
+                  obj.kit.nome.toLowerCase().includes(filter) ||
+                  (obj.kit.codigo && obj.kit.codigo.toLowerCase().includes(filter))
+              )
+        : kits.map((kit, index) => ({ kit, index }));
 
-    filteredKits.forEach(kit => {
+    filteredKits.forEach(({ kit, index }) => {
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
             <td>${kit.sku}</td>
             <td>${kit.nome}</td>
             <td>${kit.codigo || "-"}</td>
-            <td>${kit.quantidade || 1}</td>
             <td>
-                <button onclick="excluirKit(${kits.indexOf(kit)})">Excluir</button>
-                <button onclick="editarKit(${kits.indexOf(kit)})">Editar</button>
+                <button onclick="excluirKit(${index})">Excluir</button>
+                <button onclick="editarKit(${index})">Editar</button>
             </td>
         `;
 
@@ -345,16 +347,11 @@ function adicionarSeparacao() {
 }
 
 function gerarSeparacao() {
+    document.getElementById("tituloSeparacao").textContent =
+    `Relatório de Produtos - ${new Date().toLocaleDateString('pt-BR')}`;
     const tbody = document.getElementById("separacaoTableBody");
     tbody.innerHTML = "";
     // Add report header
-    const headerTr = document.createElement("tr");
-    headerTr.innerHTML = `
-        <td colspan="5" style="text-align: center; font-size: 18px; font-weight: bold; padding: 10px;">
-            Relatório de Produtos - ${new Date().toLocaleDateString('pt-BR')}
-        </td>
-    `;
-    tbody.appendChild(headerTr);
     kitsSeparacao.forEach((sep, idx) => {
         const kit = kits[sep.index];
         // Kit row with actions
@@ -393,7 +390,7 @@ function gerarSeparacao() {
         const separatorTr = document.createElement("tr");
         separatorTr.className = "separator-row";
         separatorTr.innerHTML = `
-            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #ddd;">Itens Isolados</td>
+            <td colspan="5" style="text-align: center; font-weight: bold; background-color: #ddd;">Itens Avulsos</td>
         `;
         tbody.appendChild(separatorTr);
         // Standalone products
@@ -500,36 +497,6 @@ function gerarRelatorioProdutos() {
     });
 }
 
-function importarDados() {
-    const csvText = document.getElementById("csvInput").value;
-    const lines = csvText.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('SKU,'));
-    const statusDiv = document.getElementById("importStatus");
-    statusDiv.innerHTML = "";
-    let importedProdutos = 0;
-    lines.forEach(line => {
-        const cols = line.split(',').map(col => col.trim());
-        if (cols.length >= 5) {
-            const sku = cols[0];
-            const nome = cols[1];
-            const codigo = cols[2];
-            const local = cols[3];
-            const estoque = parseInt(cols[4]) || 0;
-            if (sku && nome) {
-                const existing = produtos.find(p => p.sku === sku);
-                if (!existing) {
-                    produtos.push({ sku, nome, codigo, local, estoque });
-                    importedProdutos++;
-                }
-            }
-        }
-    });
-    localStorage.setItem("produtos", JSON.stringify(produtos));
-    statusDiv.innerHTML = `Importado: ${importedProdutos} produtos.`;
-    // Refresh tables if needed
-    if (document.getElementById("itens").style.display !== "none") {
-        renderProdutos();
-    }
-}
 
 function excluirKit(index) {
     kits.splice(index, 1);
@@ -538,26 +505,21 @@ function excluirKit(index) {
 }
 
 function editarKit(index) {
-    editingKitRow = index;
     const kit = kits[index];
-    // set form
+    editingKitRow = index;
+
     kitSku.value = kit.sku;
     nomeKit.value = kit.nome;
-    kitCodigoFull.value = kit.codigo || '';
+    kitCodigoFull.value = kit.codigo || "";
     quantidadeKit.value = kit.quantidade || 1;
-    itensKit = kit.itens.map(item => ({...item}));
+
+    itensKit = kit.itens.map(item => ({ ...item }));
     renderItensSelecionados();
-    // populate select
-    const select = document.getElementById("selectProduto");
-    select.innerHTML = '<option value="">Selecione um item</option>';
-    produtos.forEach(prod => {
-        const option = document.createElement("option");
-        option.value = prod.sku;
-        option.textContent = `${prod.sku} - ${prod.nome} (Estoque: ${prod.estoque})`;
-        select.appendChild(option);
-    });
+    populateDatalistProdutosKit();
+
     document.getElementById("popupCadastroKit").style.display = "block";
 }
+
 
 // Event listeners
 document.getElementById("uploadButton").addEventListener("click", importarDados);
@@ -621,16 +583,6 @@ function importarDados() {
     reader.readAsText(file);
 }
 
-function openKitPopup() {
-    // Populate datalist with products
-    populateDatalistProdutosKit();
-    // Reset form
-    document.getElementById("newKitForm").reset();
-    itensKit = [];
-    renderItensSelecionados();
-    // Open popup
-    document.getElementById("popupCadastroKit").style.display = "block";
-}
 
 // Search functionality
 document.getElementById("searchProdutos").addEventListener("input", function() {

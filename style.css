@@ -1,8 +1,17 @@
-/* Estilos gerais */
-body {
-    font-family: Arial, sans-serif;
+html, body {
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+.container{
+    flex: 1;
 }
 
 #titulo{
@@ -235,13 +244,12 @@ button {
 footer{
     display: flex;
     justify-content: center;
-    margin-top:auto;
     width: 100%;
-    font-size: 15px;
-    color: #0000008e;
     font-size: 12px;
+    color: #0000008e;
     text-align: center;
     padding: 10px;
+    margin-top: auto;
 }
 
 /* Print styles */
@@ -297,6 +305,19 @@ footer{
     button {
         display: none;
     }
+
+    
+    
+    /* Oculta completamente a coluna Ações */
+    #separacaoTable th:nth-child(5),
+    #separacaoTable td:nth-child(5) {
+        display: none;
+    }
+
+    /* Garante que botões nunca apareçam */
+    #separacaoTable button {
+        display: none !important;
+    }
 }
 
 /* Estilo para o seletor de separação */
@@ -345,8 +366,9 @@ footer{
 }
 
 .separacao-selector button:hover {
-    background-color: #0056b3;
+    background-color: #848484;
 }
+
 
 /* Estilo para o seletor de kit */
 .kit-selector {
@@ -365,7 +387,7 @@ footer{
 }
 
 .kit-selector input[type="text"]:focus {
-    border-color: #007bff;
+    border-color: #333;
     outline: none;
 }
 
@@ -378,7 +400,7 @@ footer{
 
 .kit-selector button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #333;
     color: white;
     border: none;
     border-radius: 5px;
@@ -386,7 +408,7 @@ footer{
 }
 
 .kit-selector button:hover {
-    background-color: #0056b3;
+    background-color: #333;
 }
 
 /* Estilo para itens selecionados do kit */
@@ -456,9 +478,8 @@ footer{
     color: #fff;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
 }
-
 
 #arquivoSelecionado {
     font-size: 13px;
@@ -467,5 +488,60 @@ footer{
 
 #uploadButton {
     display: flex;    
-    margin-top: 10px;
+    margin-top: 15px;
+}
+
+.material-symbols-outlined {
+    font-size: 20px;
+}
+
+.menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color:#636363;
+}
+
+#relatorios button {
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.separacao-topo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+#dataAlteracao {
+    font-size: 12px;
+    color: #555;
+}
+
+#separacao {
+    display: flex;
+    flex-direction: column;
+}
+
+#dataAlteracao {
+    order: -1;
+    margin-bottom: 10px;
+}
+
+#separacaoTable caption {
+    caption-side: top;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+}
+
+.tab-link.active {
+    background-color: #ffffff4d;
+    font-weight: bold;
+}
+
+.tab-link.active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
 }
