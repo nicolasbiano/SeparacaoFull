@@ -5,6 +5,31 @@ body {
     padding: 0;
 }
 
+#titulo{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+
+}
+
+#searchProdutos, #searchKits {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#cancelKit, #addKit{
+    margin-top: 25px;
+}
+
+#titulo h1{
+    font-family: 'Dongle', sans-serif;
+    font-size: 46px;
+    color: #333333;
+    margin: 20px 0;
+}
+
 /* Estilo do menu de navegação */
 .menu {
     display: flex;
@@ -245,6 +270,18 @@ footer{
         top: 0;
         width: 100%;
     }
+
+    #relatorios button {
+    background-color: #1e90ff;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    margin: 5px 5px 10px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
     .kit-row {
         background-color: #e8f4fd !important;
         -webkit-print-color-adjust: exact;
@@ -263,6 +300,15 @@ footer{
 }
 
 /* Estilo para o seletor de separação */
+
+#printSeparacao {
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 .separacao-selector {
     display: flex;
     gap: 10px;
@@ -291,8 +337,7 @@ footer{
 }
 
 .separacao-selector button {
-    padding: 10px 20px;
-    background-color: #007bff;
+        padding: 10px 20px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -397,4 +442,30 @@ footer{
 
 .kit-item-remove:hover {
     background-color: #c82333;
+}
+
+#importarProdutos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+.btnImportar {
+    background-color: #2f2f2f;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+
+#arquivoSelecionado {
+    font-size: 13px;
+    color: #333;
+}
+
+#uploadButton {
+    display: flex;    
+    margin-top: 10px;
 }

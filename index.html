@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&family=Dongle&family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="titulo"><h1>Sistema de controle - Mercado Livre Full</h1></div>
@@ -92,9 +93,6 @@
             <label for="kitCodigoFull">Código Full:</label>
             <input type="text" id="kitCodigoFull">
 
-            <label for="quantidadeKit">Quantidade:</label>
-            <input type="number" id="quantidadeKit" min="1" value="1">
-
             <label>Itens do Kit</label>
 
             <div class="kit-selector">
@@ -110,7 +108,6 @@
             <div id="itensSelecionadosKit"></div>
 
             <div id="listaProdutosKit" style="display: none;"></div>
-
 
             <div>
                 <button type="button" onclick="closeKitPopUp()" id="cancelKit">Cancelar</button>
@@ -145,10 +142,11 @@
         <!-- Aba Separação -->
         <div id="separacao" class="tab-content" style="display: none;">
             <p>Separação de Produtos</p>
+            <button type="button" id="printSeparacao" onclick="window.print()">Imprimir Separação</button>
             <div class="separacao-selector">
-                <input type="text" id="inputSeparacao" list="datalistSeparacao" placeholder="Buscar e selecionar kit ou produto">
                 <datalist id="datalistSeparacao">
                 </datalist>
+                <input type="text" id="inputSeparacao" list="datalistSeparacao" placeholder="Buscar e selecionar kit ou produto">
                 <input type="number" id="qtdSeparacao" value="1" min="1">
                 <button type="button" onclick="adicionarSeparacao()">Adicionar</button>
             </div>
@@ -193,7 +191,9 @@
             <p>Importar Produtos</p>
             <p>Use a planilha modelo para facilitar o preenchimento.</p>
             <button type="button" id="downloadTemplateButton">Baixar Modelo CSV</button><br><br>
-            <input type="file" id="csvFileInput" accept=".csv"><br><br>
+            <input type="file" id="csvFileInput" accept=".csv" hidden>
+            <button type="button" class="btnImportar"onclick="document.getElementById('csvFileInput').click()">Importar CSV</button>
+            <span id="arquivoSelecionado">Nenhum arquivo selecionado</span>
             <button type="button" id="uploadButton">Upload e Importar</button>
             <div id="importStatus"></div>
         </div>

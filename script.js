@@ -648,3 +648,11 @@ document.getElementById("inputSeparacao").addEventListener("input", function() {
 document.getElementById("inputProdutoKit").addEventListener("input", function() {
     populateDatalistProdutosKit(this.value.toLowerCase());
 });
+
+document.getElementById('csvFileInput').addEventListener('change', function () {
+    const nomeArquivo = this.files.length > 0 
+        ? this.files[0].name 
+        : 'Nenhum arquivo selecionado';
+
+    document.getElementById('arquivoSelecionado').textContent = nomeArquivo;
+});
