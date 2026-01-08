@@ -545,3 +545,480 @@ footer{
 .tab-link.active .material-symbols-outlined {
     font-variation-settings: 'FILL' 1;
 }
+
+tr.editando {
+    animation: pulseEdit 1s infinite alternate;
+}
+
+@keyframes pulseEdit {
+    from { background-color: #fff3cd; }
+    to { background-color: #ffe69c; }
+}
+
+/* ===================== */
+/* AJUSTE DE BOTÕES */
+/* ===================== */
+
+.tab-content button {
+    margin-right: 8px;
+    margin-bottom: 10px;
+}
+
+.tab-content button:last-child {
+    margin-right: 0;
+}
+
+/* Botões de ação em tabelas */
+td button {
+    margin: 3px;
+}
+
+/* Ações agrupadas */
+td:last-child {
+    white-space: nowrap;
+}
+
+/* Separação - topo */
+.separacao-topo,
+.separacao-selector {
+    margin-bottom: 20px;
+}
+
+.separacao-selector button {
+    margin-left: 5px;
+}
+
+/* Relatórios */
+#relatorios button {
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
+
+/* Importação */
+#importar button,
+#importar .btnImportar {
+    margin-top: 10px;
+}
+
+/* ===================== */
+/* IMPRESSÃO LIMPA */
+/* ===================== */
+
+@media print {
+
+    /* Esconde tudo */
+    body * {
+        visibility: hidden;
+    }
+
+    /* SEPARAÇÃO */
+    #separacao,
+    #separacao * {
+        visibility: visible;
+    }
+
+    #separacao {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* RELATÓRIO */
+    #relatorios,
+    #relatorios * {
+        visibility: visible;
+    }
+
+    #relatorios {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+    }
+
+    /* Remove tudo que não interessa */
+    button,
+    input,
+    nav,
+    footer,
+    .menu,
+    .tab-link,
+    #printSeparacao {
+        display: none !important;
+    }
+
+    /* Títulos */
+    #separacaoTable caption,
+    #relatorioTitle {
+        display: block;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    /* Tabela limpa */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        padding: 6px;
+    }
+
+    /* Remove coluna Ações */
+    th:last-child,
+    td:last-child {
+        display: none;
+    }
+
+    /* Mantém cores importantes */
+    .kit-row {
+        background-color: #e8f4fd !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .product-row {
+        background-color: #f9f9f9 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .separator-row {
+        background-color: #ededed !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+/* ============================= */
+/* TEMA LIQUID GLASS (iOS) */
+/* ============================= */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    --text-main: #1c1c1e;
+    --text-muted: #6e6e73;
+    --accent: #007aff;
+}
+
+/* Fundo geral */
+body {
+    background: linear-gradient(180deg, #f5f5f7, #ffffff);
+    color: var(--text-main);
+}
+
+/* Containers principais */
+.tab-content,
+.popUp-content,
+#itensSelecionadosKit,
+#listaProdutosKit {
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Título */
+#titulo h1 {
+    color: var(--text-main);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+/* Menu */
+.menu {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Tabs */
+.tab-link {
+    background: transparent;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.tab-link.active {
+    background: rgba(0,0,0,0.06);
+    border-radius: 12px;
+}
+
+/* Inputs */
+input,
+textarea {
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+}
+
+/* Botões – estilo Apple */
+button {
+    background: rgba(0,0,0,0.85);
+    border-radius: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* Botões secundários */
+.btn-editar {
+    background: rgba(0,0,0,0.55);
+}
+
+.btn-excluir {
+    background: rgba(255,59,48,0.85);
+}
+
+/* Tabelas */
+table {
+    background: transparent;
+}
+
+th {
+    background: rgba(0,0,0,0.04);
+    font-weight: 600;
+}
+
+td {
+    background: rgba(255,255,255,0.5);
+}
+
+/* Separação visual de linhas */
+tr {
+    transition: background 0.2s;
+}
+
+tr:hover {
+    background: rgba(0,0,0,0.03);
+}
+
+/* Kits */
+.kit-row {
+    background: rgba(0,122,255,0.08);
+}
+
+.product-row {
+    background: rgba(255,255,255,0.6);
+}
+
+/* Item em edição */
+tr.editando {
+    background: rgba(255,214,10,0.25);
+    animation: none;
+}
+
+/* Popups */
+.popUp {
+    backdrop-filter: blur(6px);
+}
+
+/* Footer clean */
+footer {
+    color: var(--text-muted);
+}
+
+/* ============================= */
+/* RESPONSIVO CLEAN */
+/* ============================= */
+
+@media (max-width: 768px) {
+
+    .menu {
+        flex-wrap: wrap;
+    }
+
+    table, thead, tbody, th, td, tr {
+        font-size: 13px;
+    }
+
+    button {
+        padding: 10px 14px;
+    }
+
+    .separacao-selector,
+    .kit-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* ============================= */
+/* PALETA OFICIAL */
+/* ============================= */
+:root {
+    --azul-marinho: #183264;
+    --azul-cobalto: #004e9b;
+    --azul-claro: #00a3e2;
+    --branco: #ffffff;
+
+    --bg-site: #f5f7fa;
+    --texto-principal: #1c1c1e;
+    --texto-secundario: #5f6b7a;
+}
+
+/* ============================= */
+/* BASE */
+/* ============================= */
+body {
+    background: linear-gradient(180deg, #eef2f7, #ffffff);
+    color: var(--texto-principal);
+}
+
+/* ============================= */
+/* TOPO */
+/* ============================= */
+#titulo h1 {
+    color: var(--azul-marinho);
+    font-weight: 600;
+}
+
+/* ============================= */
+/* MENU */
+/* ============================= */
+.menu {
+    background-color: var(--azul-marinho);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+.menu button {
+    background: transparent;
+    color: white;
+    font-weight: 500;
+}
+
+.menu button:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.tab-link.active {
+    background-color: var(--azul-claro);
+    color: white;
+}
+
+/* ============================= */
+/* CONTEÚDO */
+/* ============================= */
+.tab-content {
+    background-color: var(--branco);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* ============================= */
+/* INPUTS */
+/* ============================= */
+input,
+textarea {
+    border: 1px solid #d0d7e2;
+    border-radius: 10px;
+}
+
+input:focus {
+    border-color: var(--azul-claro);
+    box-shadow: 0 0 0 3px rgba(0,163,226,0.2);
+}
+
+/* ============================= */
+/* BOTÕES */
+/* ============================= */
+button {
+    background-color: var(--azul-cobalto);
+    color: white;
+    border-radius: 12px;
+}
+
+button:hover {
+    background-color: var(--azul-marinho);
+}
+
+/* Ações */
+.btn-editar {
+    background-color: var(--azul-claro);
+    color: #00334d;
+}
+
+.btn-excluir {
+    background-color: #d9534f;
+}
+
+/* ============================= */
+/* TABELAS */
+/* ============================= */
+th {
+    background-color: #eef2f7;
+    color: var(--azul-marinho);
+}
+
+td {
+    background-color: #ffffff;
+}
+
+/* ============================= */
+/* SEPARAÇÃO */
+/* ============================= */
+.kit-row {
+    background-color: rgba(0,78,155,0.12);
+}
+
+.product-row {
+    background-color: rgba(0,163,226,0.08);
+}
+
+/* Item em edição */
+tr.editando {
+    background-color: rgba(0,163,226,0.25);
+}
+
+/* ============================= */
+/* POPUP */
+/* ============================= */
+.popUp-content {
+    border-radius: 16px;
+}
+
+/* ============================= */
+/* RODAPÉ */
+/* ============================= */
+footer {
+    color: var(--texto-secundario);
+}
+
+/* ============================= */
+/* IMPRESSÃO (SÓ O NECESSÁRIO) */
+/* ============================= */
+@media print {
+    body {
+        background: white;
+    }
+
+    .menu,
+    button,
+    footer {
+        display: none !important;
+    }
+
+    table {
+        box-shadow: none;
+    }
+}
