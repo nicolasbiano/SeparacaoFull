@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Separação Full</title>
+    <link rel="icon" href="images/magnitudo vetor.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
-    <div id="titulo"><h1>Sistema de controle - Mercado Livre Full</h1></div>
+    <div id="titulo"><h1>Sistema de Separação Full- Mercado Livre Full</h1></div>
 
     <div class="container">
         <nav class="menu">
@@ -28,12 +29,12 @@
 
             <button class="tab-link" onclick="showTab('separacao', this)">
                 <span class="material-symbols-outlined">fact_check</span>
-                Separação
+                Produtos full
             </button>
 
             <button class="tab-link" onclick="showTab('relatorios', this)">
                 <span class="material-symbols-outlined">description</span>
-                Relatórios
+                Separação
             </button>
 
             <button class="tab-link" onclick="showTab('importar', this)">
@@ -139,7 +140,6 @@
     </div>
 </div>
 
-
            <!-- Aba Kits -->
         <div id="kits" class="tab-content" style="display: none;">
             <p>Gerenciamento de Kits</p>
@@ -163,34 +163,40 @@
         <!-- Aba Separação -->
         <div id="separacao" class="tab-content" style="display: none;">
             <p>Separação de Produtos</p>
-            <span id="dataSeparacao"></span>
-            <button type="button" id="printSeparacao" onclick="window.print()">Imprimir Separação</button>
-            <div class="separacao-selector">
+            
+            <div class="no-print">
+                <input type="text" id="numeroPedido" placeholder="Número do Pedido (Ex: ZDPH89859)" oninput="atualizarTituloPedido()">
+                <button type="button" id="printSeparacao" onclick="window.print()">Imprimir Lista Produtos</button>
+            </div>
+
+            <h2 id="displayPedido" class="print-only"></h2>
+
+            <div class="separacao-selector no-print">
                 <datalist id="datalistSeparacao"></datalist>
                 <input type="text" id="inputSeparacao" list="datalistSeparacao" placeholder="Buscar e selecionar kit ou produto">
                 <input type="number" id="qtdSeparacao" value="1" min="1">
                 <button type="button" onclick="adicionarSeparacao()">Adicionar</button>
             </div>
                 <table id="separacaoTable">
-                    <caption id="tituloSeparacao"></caption>
                     <thead>
                         <tr>
                             <th>SKU</th>
-                            <th>Nome</th>
+                            <th>Descrição</th>
                             <th>Quantidade</th>
-                            <th>Código Full</th>
-                            <th>Ações</th>
+                            <th>Observação</th>
+                            <th class="no-print">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="separacaoTableBody"></tbody>
+                        <tbody id="separacaoKitsBody"></tbody>
+                        <tbody id="separacaoAvulsosBody"></tbody>
                 </table>
         </div>
 
         <!-- Aba Relatórios -->
         <div id="relatorios" class="tab-content" style="display: none;">
             <p>Relatórios</p>
-            <button type="button" onclick="gerarRelatorioProdutos()">Gerar Relatório de Produtos</button>
-            <button type="button" onclick="window.print()">Imprimir Relatório</button>
+            <button type="button" onclick="gerarRelatorioProdutos()">Gerar Lista de Separação</button>
+            <button type="button" onclick="window.print()">Imprimir Separação</button>
             <div id="relatorioTitle" style="display: none; text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0;"></div>
             <table id="relatorioTable">
                 <thead>
@@ -225,6 +231,12 @@
         <section id="direitos"> © 2025 Nicolas Biano Luvisuto. Todos os direitos reservados.</section>
     </footer>
 
-    <script src="script.js"></script>
+        <!-- Firebase App (necessário) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>

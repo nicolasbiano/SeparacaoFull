@@ -1,15 +1,77 @@
 /***********************
+ * FIREBASE
+ ***********************/
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCMOOpIoaurHT2CyhHEN4vZxGmzedhaIwM",
+  authDomain: "separacaofull.firebaseapp.com",
+  databaseURL: "https://separacaofull-default-rtdb.firebaseio.com",
+  projectId: "separacaofull",
+  storageBucket: "separacaofull.firebasestorage.app",
+  messagingSenderId: "137169730444",
+  appId: "1:137169730444:web:0ed636854db0fe6f4734a9",
+  measurementId: "G-LVQ56WFB5G"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const produtosCol = collection(db, "produtos");
+const kitsCol = collection(db, "kits");
+const historicoCol = collection(db, "historico");
+
+/***********************
  * STORAGE
  ***********************/
-let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-let kits = JSON.parse(localStorage.getItem("kits")) || [];
+let produtos = [];
+let kits = [];
 let separacao = [];
 let editandoSeparacaoIndex = null;
-let historico = JSON.parse(localStorage.getItem("historico")) || [];
+let historico = [];
+
+async function carregarProdutos() {
+    const snapshot = await getDocs(produtosCol);
+    produtos = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    renderProdutos();
+}
+
+async function carregarKits() {
+    const snapshot = await getDocs(kitsCol);
+    kits = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    renderKits();
+}
+
+async function carregarHistorico() {
+    const snapshot = await getDocs(historicoCol);
+    historico = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+}
 
 /***********************
  * ELEMENTOS
  ***********************/
+const separacaoKitsBody = document.getElementById("separacaoKitsBody");
+const separacaoAvulsosBody = document.getElementById("separacaoAvulsosBody");
+
+// === INPUTS PRODUTO ===
+const sku = document.getElementById("sku");
+const nomeProduto = document.getElementById("nomeProduto");
+const codigoFull = document.getElementById("codigoFull");
+const localizacao = document.getElementById("localizacao");
+const estoque = document.getElementById("estoque");
+// === INPUTS KIT ===
+const kitSku = document.getElementById("kitSku");
+const nomeKit = document.getElementById("nomeKit");
+const kitCodigoFull = document.getElementById("kitCodigoFull");
+const inputProdutoKit = document.getElementById("inputProdutoKit");
+const qtdProdutoKit = document.getElementById("qtdProdutoKit");
+const itensSelecionadosKit = document.getElementById("itensSelecionadosKit");
+// === INPUTS SEPARAÇÃO ===
+const inputSeparacao = document.getElementById("inputSeparacao");
+const qtdSeparacao = document.getElementById("qtdSeparacao");
+// === TABELAS ===
 const productTableBody = document.getElementById("productTableBody");
 const kitTableBody = document.getElementById("kitTableBody");
 const separacaoTableBody = document.getElementById("separacaoTableBody");
@@ -78,8 +140,20 @@ function showTab(id, btn) {
 /***********************
  * PRODUTOS
  ***********************/
-function salvarProdutos() {
-    localStorage.setItem("produtos", JSON.stringify(produtos));
+async function salvarProdutoFirebase(produto) {
+    
+    if (produto.id) {
+        const docRef = doc(db, "produtos", produto.id);
+        await updateDoc(docRef, produto);
+    } else {
+        const docRef = await addDoc(produtosCol, produto);
+        produto.id = docRef.id;
+    }
+}
+async function salvarTodosProdutosFirebase() {
+    for (const p of produtos) {
+        await salvarProdutoFirebase(p);
+    }
 }
 
 function renderProdutos() {
@@ -100,20 +174,30 @@ function renderProdutos() {
     });
 }
 
-document.getElementById("newItemForm").addEventListener("submit", e => {
+document.getElementById("newItemForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    produtos.push({
-        sku: sku.value.trim(),
-        nome: nomeProduto.value.trim(),
-        codigoFull: codigoFull.value.trim(),
-        localizacao: localizacao.value.trim(),
-        estoque: Number(estoque.value)
-    });
+    try {
+        const novoProduto = {
+            sku: sku.value.trim(),
+            nome: nomeProduto.value.trim(),
+            codigoFull: codigoFull.value.trim(),
+            localizacao: localizacao.value.trim(),
+            estoque: Number(estoque.value)
+        };
 
-    salvarProdutos();
-    renderProdutos();
-    closePopup();
+        await salvarProdutoFirebase(novoProduto);
+
+        produtos.push(novoProduto);
+        renderProdutos();
+        closePopup();
+
+        console.log("Produto salvo com sucesso:", novoProduto);
+
+    } catch (erro) {
+        console.error("ERRO AO SALVAR PRODUTO:", erro);
+        alert("Erro ao salvar produto. Veja o console (F12).");
+    }
 });
 
 function editarProduto(i) {
@@ -127,13 +211,18 @@ function editarProduto(i) {
     openPopUp();
 }
 
-function excluirProduto(i) {
-    if (confirm("Excluir produto?")) {
-        produtos.splice(i, 1);
-        salvarProdutos();
-        renderProdutos();
+async function excluirProduto(i) {
+    if (!confirm("Excluir produto?")) return;
+
+    const p = produtos[i];
+    if (p.id) {
+        await deleteDoc(doc(db, "produtos", p.id));
     }
+
+    produtos.splice(i, 1);
+    renderProdutos();
 }
+
 
 /***********************
  * KITS
@@ -177,7 +266,7 @@ function removerItemKit(i) {
     renderItensKit();
 }
 
-newKitForm.addEventListener("submit", e => {
+newKitForm.addEventListener("submit", async e => {
     e.preventDefault();
 
     const kit = {
@@ -187,11 +276,24 @@ newKitForm.addEventListener("submit", e => {
         itens: [...itensKit]
     };
 
-    editandoKit !== null ? kits[editandoKit] = kit : kits.push(kit);
-    localStorage.setItem("kits", JSON.stringify(kits));
+    await salvarKitFirebase(kit);
+
+    if (editandoKit !== null) kits[editandoKit] = kit;
+    else kits.push(kit);
+
     renderKits();
     closeKitPopUp();
 });
+
+    async function salvarKitFirebase(kit) {
+    if (kit.id) {
+        const docRef = doc(db, "kits", kit.id);
+        await updateDoc(docRef, kit);
+    } else {
+        const docRef = await addDoc(kitsCol, kit);
+        kit.id = docRef.id;
+    }
+}
 
 function renderKits() {
     kitTableBody.innerHTML = "";
@@ -209,25 +311,30 @@ function renderKits() {
     });
 }
 
-function excluirKit(index) {
+async function excluirKit(index) {
     const kit = kits[index];
+
+    // Primeiro verifica se o kit está sendo usado na separação
+    if (separacao.some(s => s.valor === `KIT:${kit.sku}`)) {
+        alert("Este kit está em uso na separação.");
+        return;
+    }
 
     if (!confirm(`Excluir o kit "${kit.nome}"?`)) return;
 
-    // Remove da separação se estiver sendo usado
+    // Remove da separação (mesmo que não existam, só garante)
     separacao = separacao.filter(s => s.valor !== `KIT:${kit.sku}`);
 
+    // Deleta do Firebase
+    if (kit.id) {
+        await deleteDoc(doc(db, "kits", kit.id));
+    }
+
+    // Remove do array local
     kits.splice(index, 1);
-    localStorage.setItem("kits", JSON.stringify(kits));
 
     renderKits();
     renderSeparacao();
-    
-    if (separacao.some(s => s.valor === `KIT:${kit.sku}`)) {
-    alert("Este kit está em uso na separação.");
-    return;
-}
-
 }
 
 function editarKit(i) {
@@ -250,25 +357,43 @@ function preencherDatalistSeparacao() {
     kits.forEach(k => datalistSeparacao.append(new Option(`KIT:${k.sku}`, `KIT:${k.sku}`)));
 }
 
-function adicionarSeparacao() {
+async function adicionarSeparacao() {
     const valor = inputSeparacao.value.trim();
     const qtd = Number(qtdSeparacao.value);
-    if (!valor || qtd <= 0) return alert("Dados inválidos");
+
+    if (!valor || qtd <= 0) {
+        alert("Dados inválidos");
+        return;
+    }
+
+    const existeProduto = produtos.some(p => p.sku === valor);
+    const existeKit = kits.some(k => `KIT:${k.sku}` === valor);
+
+    if (!existeProduto && !existeKit) {
+        alert("Produto ou kit não cadastrado");
+        return;
+    }
 
     if (editandoSeparacaoIndex !== null) {
         separacao[editandoSeparacaoIndex] = { valor, qtd };
         editandoSeparacaoIndex = null;
     } else {
-        separacao.push({ valor, qtd });
+    separacao.push({
+        valor,
+        qtd
+     });
     }
+
 
     inputSeparacao.value = "";
     qtdSeparacao.value = 1;
     renderSeparacao();
+    await salvarSeparacaoFirebase();
 }
 
 function renderSeparacao() {
-    separacaoTableBody.innerHTML = "";
+    separacaoKitsBody.innerHTML = "";
+    separacaoAvulsosBody.innerHTML = "";
 
     const kitsSep = separacao
         .map((item, index) => ({ ...item, index }))
@@ -278,61 +403,66 @@ function renderSeparacao() {
         .map((item, index) => ({ ...item, index }))
         .filter(i => !i.valor.startsWith("KIT:"));
 
-    if (kitsSep.length) {
-        separacaoTableBody.innerHTML += `<tr><th colspan="5">KITS</th></tr>`;
-    }
-
+    // ===== KITS =====
     kitsSep.forEach(item => {
         const kit = kits.find(k => k.sku === item.valor.replace("KIT:", ""));
 
-        separacaoTableBody.innerHTML += `
-        <tr class="kit-row ${item.index === editandoSeparacaoIndex ? 'editando' : ''}">
-            <td>${kit?.sku || "KIT REMOVIDO"}</td>
+        separacaoKitsBody.innerHTML += `
+        <tr class="kit-row">
+            <td>${kit?.sku || ""}</td>
             <td>${kit?.nome || ""}</td>
             <td>${item.qtd}</td>
-            <td>${kit?.codigoFull || ""}</td>
-            <td>
+            <td>KIT</td>
+            <td class="no-print">
                 <button onclick="editarSeparacao(${item.index})">Editar</button>
                 <button onclick="removerSeparacao(${item.index})">X</button>
             </td>
-        </tr>`;
+        </tr>
+        `;
 
         kit?.itens.forEach(it => {
             const p = produtos.find(pr => pr.sku === it.sku);
-            separacaoTableBody.innerHTML += `
-            <tr class="product-row">
+            separacaoKitsBody.innerHTML += `
+            <tr class="kit-produto">
                 <td>${it.sku}</td>
                 <td>${p?.nome || "NÃO CADASTRADO"}</td>
-                <td>${it.qtd * item.qtd}</td>
-                <td>${p?.codigoFull || ""}</td>
+                <td>x${it.qtd}</td>
                 <td></td>
-            </tr>`;
+                <td class="no-print"></td>
+            </tr>
+            `;
         });
     });
 
-    if (avulsosSep.length) {
-        separacaoTableBody.innerHTML += `<tr><th colspan="5">PRODUTOS AVULSOS</th></tr>`;
-    }
-
+    // ===== AVULSOS =====
     avulsosSep.forEach(item => {
         const p = produtos.find(pr => pr.sku === item.valor);
-        separacaoTableBody.innerHTML += `
+        separacaoAvulsosBody.innerHTML += `
         <tr class="${item.index === editandoSeparacaoIndex ? 'editando' : ''}">
             <td>${item.valor}</td>
             <td>${p?.nome || ""}</td>
             <td>${item.qtd}</td>
-            <td>${p?.codigoFull || ""}</td>
-            <td>
+            <td>x${item.qtd}</td>
+            <td class="no-print">
                 <button onclick="editarSeparacao(${item.index})">Editar</button>
                 <button onclick="removerSeparacao(${item.index})">X</button>
             </td>
-        </tr>`;
+        </tr>
+        `;
     });
 }
 
-function removerSeparacao(i) {
+function atualizarTituloPedido() {
+    const numero = document.getElementById("numeroPedido").value;
+    document.getElementById("displayPedido").textContent = numero ? `Pedido: ${numero}` : "";
+}
+window.atualizarTituloPedido = atualizarTituloPedido;
+
+
+async function removerSeparacao(i) {
     separacao.splice(i, 1);
     renderSeparacao();
+    await salvarSeparacaoFirebase();
 }
 
 function editarSeparacao(index) {
@@ -348,7 +478,7 @@ function editarSeparacao(index) {
 /***********************
  * RELATÓRIO + HISTÓRICO
  ***********************/
-function gerarRelatorioProdutos() {
+async function gerarRelatorioProdutos() {
     if (!separacao.length) {
         alert("Nenhum item separado");
         return;
@@ -368,18 +498,19 @@ function gerarRelatorioProdutos() {
             mapa[item.valor] = (mapa[item.valor] || 0) + item.qtd;
         }
     });
-showTab("relatorios");
 
-renderRelatorioProdutos(mapa);
+    showTab("relatorios");
+    renderRelatorioProdutos(mapa);
 
-historico.push({
-    data: new Date().toLocaleString(),
-    itens: mapa
-});
+    const histItem = {
+        data: new Date().toLocaleString(),
+        itens: mapa
+    };
 
-localStorage.setItem("historico", JSON.stringify(historico));
-
+    await addDoc(historicoCol, histItem);
+    historico.push(histItem);
 }
+
 
 function renderRelatorioProdutos(dados) {
     const tbody = document.getElementById("relatorioTableBody");
@@ -387,18 +518,19 @@ function renderRelatorioProdutos(dados) {
 
     tbody.innerHTML = "";
 
-    Object.entries(dados).forEach(([sku, qtd]) => {
-        const p = produtos.find(pr => pr.sku === sku);
+        Object.entries(dados).forEach(([sku, qtd]) => {
+            const p = produtos.find(pr => pr.sku === sku);
 
-        tbody.innerHTML += `
-        <tr>
-            <td>${sku}</td>
-            <td>${p?.nome || "NÃO CADASTRADO"}</td>
-            <td>${p?.localizacao || ""}</td>
-            <td>${qtd}</td>
-            <td></td>
-        </tr>`;
-    });
+            tbody.innerHTML += `
+                <tr>
+                    <td>${sku}</td>
+                    <td>${p?.nome || "NÃO CADASTRADO"}</td>
+                    <td>${p?.localizacao || ""}</td>
+                    <td>${qtd}</td>
+                    <td>${p ? "SIM" : "NÃO"}</td>
+                </tr>
+            `;
+        });
 }
 
 /***********************
@@ -411,27 +543,122 @@ csvInput.addEventListener("change", () => {
     }
 });
 
+document.getElementById("downloadTemplateButton").onclick = () => {
+    const csv = "sku,nome,codigoFull,localizacao,estoque\n";
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "modelo_produtos.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+};
+
 document.getElementById("uploadButton").onclick = () => {
     const file = csvInput.files[0];
     if (!file) return alert("Selecione um CSV");
 
     const reader = new FileReader();
-    reader.onload = e => {
-        const linhas = e.target.result.replace(/\r/g, "").split("\n").slice(1);
-        linhas.forEach(l => {
-            const [sku, nome, codigoFull = "", localizacao, estoque] = l.split(",");
-            if (!sku || !nome || !localizacao || isNaN(estoque)) return;
-            produtos.push({ sku, nome, codigoFull, localizacao, estoque: Number(estoque) });
-        });
-        salvarProdutos();
-        renderProdutos();
+
+    reader.onload = async e => {
+        const linhas = e.target.result
+            .replace(/\r/g, "")
+            .split("\n")
+            .slice(1); // remove cabeçalho
+
+        let novos = 0;
+
+        for (const l of linhas) {
+            if (!l.trim()) continue;
+
+            const colunas = l.includes(";") ? l.split(";") : l.split(",");
+            const [sku, nome, codigoFull = "", localizacao, estoque] = colunas;
+
+
+            if (!sku || !nome || !localizacao || isNaN(estoque)) continue;
+
+            if (produtos.some(p => p.sku === sku.trim())) continue;
+
+            const produto = {
+                sku: sku.trim(),
+                nome: nome.trim(),
+                codigoFull: codigoFull.trim(),
+                localizacao: localizacao.trim(),
+                estoque: Number(estoque)
+            };
+
+            await salvarProdutoFirebase(produto);
+            novos++;
+        }
+
+        // RECARREGA TUDO DO FIRESTORE
+        await carregarProdutos();
+
+        // ATUALIZA DATALISTS
+        atualizarDatalistProdutosKit();
+        preencherDatalistSeparacao();
+
         btnRemoverArquivo.onclick();
+
+        alert(`${novos} produtos importados com sucesso`);
     };
+
     reader.readAsText(file, "UTF-8");
 };
 
 /***********************
+ * SEPARAÇÃO - FIRESTORE
+ ***********************/
+async function salvarSeparacaoFirebase() {
+    const refSep = doc(db, "separacoes", "atual");
+    await setDoc(refSep, { itens: separacao });
+}
+
+async function carregarSeparacaoFirebase() {
+    const refSep = doc(db, "separacoes", "atual");
+    const snap = await getDoc(refSep);
+    return snap.exists() ? snap.data().itens : [];
+}
+
+async function limparSeparacaoFirebase() {
+    const refSep = doc(db, "separacoes", "atual");
+    await setDoc(refSep, { itens: [] });
+}
+
+// === EXPOE FUNÇÕES PARA BOTÕES (OBRIGATÓRIO EM MODULE) ===
+window.editarProduto = editarProduto;
+window.excluirProduto = excluirProduto;
+
+window.adicionarProdutoKit = adicionarProdutoKit;
+window.removerItemKit = removerItemKit;
+window.editarKit = editarKit;
+window.excluirKit = excluirKit;
+
+window.adicionarSeparacao = adicionarSeparacao;
+window.editarSeparacao = editarSeparacao;
+window.removerSeparacao = removerSeparacao;
+
+window.openPopUp = openPopUp;
+window.closePopup = closePopup;
+window.openKitPopUp = openKitPopUp;
+window.closeKitPopUp = closeKitPopUp;
+
+window.showTab = showTab;
+window.gerarRelatorioProdutos = gerarRelatorioProdutos;
+
+/***********************
  * INIT
  ***********************/
-renderProdutos();
-renderKits();
+(async function init() {
+    await carregarProdutos();
+    await carregarKits();
+    await carregarHistorico();
+
+    // 🔥 RESTAURA SEPARAÇÃO
+    separacao = await carregarSeparacaoFirebase();
+    preencherDatalistSeparacao();
+    renderSeparacao();
+})();

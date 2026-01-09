@@ -1,13 +1,17 @@
-html, body {
+html{
     margin: 0;
     padding: 0;
     min-height: 100vh;
 }
-
 body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #eef2f7, #ffffff);
+    color: var(--texto-principal);
 }
 
 .container{
@@ -18,7 +22,13 @@ body {
     display: flex;
     justify-content: center;
     text-align: center;
+}
 
+#numeroPedido {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 #searchProdutos, #searchKits {
@@ -252,72 +262,10 @@ footer{
     margin-top: auto;
 }
 
-/* Print styles */
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    #separacaoTable, #separacaoTable * {
-        visibility: visible;
-    }
-    #separacaoTable {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-    #relatorioTable, #relatorioTable * {
-        visibility: visible;
-    }
-    #relatorioTitle {
-        display: none;
-    }
-    #relatorioTable {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-
-    #relatorios button {
-    background-color: #1e90ff;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    margin: 5px 5px 10px 0;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-    .kit-row {
-        background-color: #e8f4fd !important;
-        -webkit-print-color-adjust: exact;
-    }
-    .product-row {
-        background-color: #f9f9f9 !important;
-        -webkit-print-color-adjust: exact;
-    }
-    .separator-row {
-        background-color: #f0f0f0 !important;
-        -webkit-print-color-adjust: exact;
-    }
-    button {
-        display: none;
-    }
-
-    
-    
-    /* Oculta completamente a coluna Ações */
-    #separacaoTable th:nth-child(5),
-    #separacaoTable td:nth-child(5) {
-        display: none;
-    }
-
-    /* Garante que botões nunca apareçam */
-    #separacaoTable button {
-        display: none !important;
-    }
+/* MOSTRA OS TÍTULOS DE SEPARAÇÃO */
+.titulo-separacao,
+.titulo-separacao * {
+    visibility: visible !important;
 }
 
 /* Estilo para o seletor de separação */
@@ -474,7 +422,7 @@ footer{
 }
 
 .btnImportar {
-    background-color: #2f2f2f;
+    background-color: #004e9b;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -600,101 +548,6 @@ td:last-child {
     margin-top: 10px;
 }
 
-/* ===================== */
-/* IMPRESSÃO LIMPA */
-/* ===================== */
-
-@media print {
-
-    /* Esconde tudo */
-    body * {
-        visibility: hidden;
-    }
-
-    /* SEPARAÇÃO */
-    #separacao,
-    #separacao * {
-        visibility: visible;
-    }
-
-    #separacao {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 0;
-    }
-
-    /* RELATÓRIO */
-    #relatorios,
-    #relatorios * {
-        visibility: visible;
-    }
-
-    #relatorios {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 0;
-    }
-
-    /* Remove tudo que não interessa */
-    button,
-    input,
-    nav,
-    footer,
-    .menu,
-    .tab-link,
-    #printSeparacao {
-        display: none !important;
-    }
-
-    /* Títulos */
-    #separacaoTable caption,
-    #relatorioTitle {
-        display: block;
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    /* Tabela limpa */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    th, td {
-        border: 1px solid #000;
-        padding: 6px;
-    }
-
-    /* Remove coluna Ações */
-    th:last-child,
-    td:last-child {
-        display: none;
-    }
-
-    /* Mantém cores importantes */
-    .kit-row {
-        background-color: #e8f4fd !important;
-        -webkit-print-color-adjust: exact;
-    }
-
-    .product-row {
-        background-color: #f9f9f9 !important;
-        -webkit-print-color-adjust: exact;
-    }
-
-    .separator-row {
-        background-color: #ededed !important;
-        -webkit-print-color-adjust: exact;
-    }
-}
-
 /* ============================= */
 /* TEMA LIQUID GLASS (iOS) */
 /* ============================= */
@@ -703,186 +556,14 @@ td:last-child {
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    --text-main: #1c1c1e;
-    --text-muted: #6e6e73;
-    --accent: #007aff;
-}
 
-/* Fundo geral */
-body {
-    background: linear-gradient(180deg, #f5f5f7, #ffffff);
-    color: var(--text-main);
-}
-
-/* Containers principais */
-.tab-content,
-.popUp-content,
-#itensSelecionadosKit,
-#listaProdutosKit {
-    background: var(--glass-bg);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-}
-
-/* Título */
-#titulo h1 {
-    color: var(--text-main);
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-
-/* Menu */
-.menu {
-    background: rgba(255,255,255,0.6);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-/* Tabs */
-.tab-link {
-    background: transparent;
-    color: var(--text-main);
-    font-weight: 500;
-}
-
-.tab-link.active {
-    background: rgba(0,0,0,0.06);
-    border-radius: 12px;
-}
-
-/* Inputs */
-input,
-textarea {
-    background: rgba(255,255,255,0.8);
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 12px;
-    font-size: 15px;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
-}
-
-/* Botões – estilo Apple */
-button {
-    background: rgba(0,0,0,0.85);
-    border-radius: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-button:hover {
-    transform: translateY(-1px);
-    opacity: 0.9;
-}
-
-/* Botões secundários */
-.btn-editar {
-    background: rgba(0,0,0,0.55);
-}
-
-.btn-excluir {
-    background: rgba(255,59,48,0.85);
-}
-
-/* Tabelas */
-table {
-    background: transparent;
-}
-
-th {
-    background: rgba(0,0,0,0.04);
-    font-weight: 600;
-}
-
-td {
-    background: rgba(255,255,255,0.5);
-}
-
-/* Separação visual de linhas */
-tr {
-    transition: background 0.2s;
-}
-
-tr:hover {
-    background: rgba(0,0,0,0.03);
-}
-
-/* Kits */
-.kit-row {
-    background: rgba(0,122,255,0.08);
-}
-
-.product-row {
-    background: rgba(255,255,255,0.6);
-}
-
-/* Item em edição */
-tr.editando {
-    background: rgba(255,214,10,0.25);
-    animation: none;
-}
-
-/* Popups */
-.popUp {
-    backdrop-filter: blur(6px);
-}
-
-/* Footer clean */
-footer {
-    color: var(--text-muted);
-}
-
-/* ============================= */
-/* RESPONSIVO CLEAN */
-/* ============================= */
-
-@media (max-width: 768px) {
-
-    .menu {
-        flex-wrap: wrap;
-    }
-
-    table, thead, tbody, th, td, tr {
-        font-size: 13px;
-    }
-
-    button {
-        padding: 10px 14px;
-    }
-
-    .separacao-selector,
-    .kit-selector {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
-/* ============================= */
-/* PALETA OFICIAL */
-/* ============================= */
-:root {
     --azul-marinho: #183264;
     --azul-cobalto: #004e9b;
     --azul-claro: #00a3e2;
     --branco: #ffffff;
 
-    --bg-site: #f5f7fa;
     --texto-principal: #1c1c1e;
     --texto-secundario: #5f6b7a;
-}
-
-/* ============================= */
-/* BASE */
-/* ============================= */
-body {
-    background: linear-gradient(180deg, #eef2f7, #ffffff);
-    color: var(--texto-principal);
 }
 
 /* ============================= */
@@ -1004,21 +685,103 @@ footer {
     color: var(--texto-secundario);
 }
 
-/* ============================= */
-/* IMPRESSÃO (SÓ O NECESSÁRIO) */
-/* ============================= */
+/* Separação visual entre kits e produtos */
+.linha-kit {
+    background-color: rgba(0, 150, 255, 0.12);
+    border-top: 3px solid #0096ff;
+}
+
+.linha-produto {
+    background-color: rgba(0, 255, 150, 0.12);
+    border-top: 1px dashed #00aa77;
+}
+
+/* Não aparece na tela */
+@media screen {
+    .print-only {
+        display: none;
+    }
+}
+
 @media print {
     body {
-        background: white;
+        background: #fff;
+        color: #000;
+        font-size: 12px;
+        margin: 20px;
+        font-family: Arial, sans-serif;
     }
 
-    .menu,
-    button,
-    footer {
+    nav, .menu, button, footer, .no-print {
         display: none !important;
     }
 
-    table {
+    /* Exibe apenas a aba ativa */
+    .tab-content {
+        display: none !important;
         box-shadow: none;
+        padding: 0;
+    }
+
+    .tab-content[style*="display: block"] {
+        display: block !important;
+    }
+
+    /* Título do pedido */
+    #displayPedido {
+        display: block !important;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 20px 0;
+        text-align: left;
+    }
+
+    /* Tabela geral */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    th, td {
+        border: none;
+        padding: 8px;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    /* Cabeçalho da Tabela (Verde) */
+    th {
+        background-color: #d9ead3 !important; /* Verde claro */
+        font-weight: bold;
+        color: #000;
+        border-bottom: 1px solid #ccc;
+    }
+
+    /* Linha do KIT (Laranja/Pêssego) */
+    .kit-row td {
+        background-color: #fce5cd !important; /* Laranja claro */
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Produtos dentro do KIT (Branco) */
+    .kit-produto td {
+        background-color: #fff !important;
+        padding-left: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Produtos avulsos (Laranja/Pêssego) */
+    #separacaoAvulsosBody tr td {
+        background-color: #fce5cd !important;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Alinhamento da Quantidade e Observação */
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4) {
+        text-align: center;
     }
 }
