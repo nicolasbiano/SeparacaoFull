@@ -32,6 +32,44 @@ let separacao = [];
 let editandoSeparacaoIndex = null;
 let historico = [];
 
+// ===============================
+// PESQUISA DE PRODUTOS
+// ===============================
+const inputPesquisaProdutos = document.getElementById("searchProdutos");
+
+if (inputPesquisaProdutos) {
+    inputPesquisaProdutos.addEventListener("input", () => {
+        const termo = inputPesquisaProdutos.value.toLowerCase();
+
+        const filtrados = produtos.filter(p =>
+            p.sku.toLowerCase().includes(termo) ||
+            p.nome.toLowerCase().includes(termo) ||
+            (p.codigoFull || "").toLowerCase().includes(termo)
+        );
+
+        renderProdutos(filtrados);
+    });
+}
+
+// ===============================
+// PESQUISA DE KITS
+// ===============================
+const inputPesquisaKits = document.getElementById("searchKits");
+
+if (inputPesquisaKits) {
+    inputPesquisaKits.addEventListener("input", () => {
+        const termo = inputPesquisaKits.value.toLowerCase();
+
+        const filtrados = kits.filter(k =>
+            k.sku.toLowerCase().includes(termo) ||
+            k.nome.toLowerCase().includes(termo) ||
+            (k.codigoFull || "").toLowerCase().includes(termo)
+        );
+
+        renderKits(filtrados);
+    });
+}
+
 async function carregarProdutos() {
     const snapshot = await getDocs(produtosCol);
     produtos = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
@@ -156,9 +194,9 @@ async function salvarTodosProdutosFirebase() {
     }
 }
 
-function renderProdutos() {
+function renderProdutos(lista = produtos) {
     productTableBody.innerHTML = "";
-    produtos.forEach((p, i) => {
+    lista.forEach((p, i) => {
         productTableBody.innerHTML += `
         <tr>
             <td>${p.sku}</td>
@@ -173,6 +211,7 @@ function renderProdutos() {
         </tr>`;
     });
 }
+
 
 document.getElementById("newItemForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -411,6 +450,7 @@ function renderSeparacao() {
         <tr class="kit-row">
             <td>${kit?.sku || ""}</td>
             <td>${kit?.nome || ""}</td>
+            <td>${kit?.codigoFull || ""}</td>
             <td>${item.qtd}</td>
             <td>KIT</td>
             <td class="no-print">
@@ -426,6 +466,7 @@ function renderSeparacao() {
             <tr class="kit-produto">
                 <td>${it.sku}</td>
                 <td>${p?.nome || "NÃO CADASTRADO"}</td>
+                <td>${p?.codigoFull || ""}</td>
                 <td>x${it.qtd}</td>
                 <td></td>
                 <td class="no-print"></td>
@@ -441,8 +482,9 @@ function renderSeparacao() {
         <tr class="${item.index === editandoSeparacaoIndex ? 'editando' : ''}">
             <td>${item.valor}</td>
             <td>${p?.nome || ""}</td>
+            <td>${p?.codigoFull || ""}</td>
             <td>${item.qtd}</td>
-            <td>x${item.qtd}</td>
+            <td></td>
             <td class="no-print">
                 <button onclick="editarSeparacao(${item.index})">Editar</button>
                 <button onclick="removerSeparacao(${item.index})">X</button>
@@ -468,11 +510,81 @@ async function removerSeparacao(i) {
 function editarSeparacao(index) {
     const item = separacao[index];
 
-    inputSeparacao.value = item.valor;
-    qtdSeparacao.value = item.qtd;
+    const isKit = item.valor.startsWith("KIT:");
+    let nome = "";
+    let codigo = "";
 
-    editandoSeparacaoIndex = index;
+    if (isKit) {
+        const kit = kits.find(k => k.sku === item.valor.replace("KIT:", ""));
+        nome = kit?.nome || "";
+        codigo = kit?.codigoFull || "";
+    } else {
+        const p = produtos.find(pr => pr.sku === item.valor);
+        nome = p?.nome || "";
+        codigo = p?.codigoFull || "";
+    }
+
+    document.getElementById("editLinhaRef").value = index;
+    document.getElementById("editSku").value = item.valor;
+    document.getElementById("editDescricao").value = nome;
+    document.getElementById("editCodigoFull").value = codigo;
+    document.getElementById("editQtd").value = item.qtd;
+    document.getElementById("editObs").value = isKit ? "KIT" : "";
+
+    document.getElementById("modalEditar").style.display = "flex";
+}
+
+function salvarEdicao() {
+    const index = Number(document.getElementById("editLinhaRef").value);
+    const qtdNova = Number(document.getElementById("editQtd").value);
+
+    if (qtdNova <= 0 || isNaN(qtdNova)) {
+        alert("Quantidade inválida");
+        return;
+    }
+
+    const item = separacao[index];
+
+    // === PRODUTO AVULSO ===
+    if (!item.valor.startsWith("KIT:")) {
+        const produto = produtos.find(p => p.sku === item.valor);
+
+        if (produto && qtdNova > produto.estoque) {
+            alert(`Estoque insuficiente.\nDisponível: ${produto.estoque}`);
+            return;
+        }
+    }
+
+    // === KIT ===
+    if (item.valor.startsWith("KIT:")) {
+        const kit = kits.find(k => `KIT:${k.sku}` === item.valor);
+        if (kit) {
+            for (const it of kit.itens) {
+                const prod = produtos.find(p => p.sku === it.sku);
+                if (!prod) continue;
+
+                const necessario = it.qtd * qtdNova;
+                if (necessario > prod.estoque) {
+                    alert(
+                        `Estoque insuficiente para o kit.\n` +
+                        `${prod.nome}\nNecessário: ${necessario} | Disponível: ${prod.estoque}`
+                    );
+                    return;
+                }
+            }
+        }
+    }
+
+    // SALVA
+    separacao[index].qtd = qtdNova;
+
+    fecharModal();
     renderSeparacao();
+    salvarSeparacaoFirebase();
+}
+
+function fecharModal() {
+    document.getElementById("modalEditar").style.display = "none";
 }
 
 /***********************
@@ -648,6 +760,9 @@ window.closeKitPopUp = closeKitPopUp;
 
 window.showTab = showTab;
 window.gerarRelatorioProdutos = gerarRelatorioProdutos;
+
+window.salvarEdicao = salvarEdicao;
+window.fecharModal = fecharModal;
 
 /***********************
  * INIT
