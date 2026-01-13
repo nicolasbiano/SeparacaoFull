@@ -1,3 +1,4 @@
+﻿/* CSS básico para o sistema de separação */
 html{
     margin: 0;
     padding: 0;
@@ -9,19 +10,11 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
     background: linear-gradient(180deg, #eef2f7, #ffffff);
-    color: var(--texto-principal);
-}
-
-/* ============================= */
-/* CABEÇALHO */
-/* ============================= */
-
-header {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    color: #333;
 }
 
 #titulo {
@@ -33,91 +26,70 @@ header {
 
 .container{
     flex: 1;
-}
-
-#numeroPedido {
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#searchProdutos, #searchKits {
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#cancelKit, #addKit{
-    margin-top: 25px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 #titulo h1{
-    font-family: 'Dongle', sans-serif;
-    font-size: 46px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
     color: #333333;
     margin: 20px 0;
 }
 
-/* Estilo do menu de navegação */
-
-.tab-link {
-    padding: 10px 20px;
-    background-color: #0000008f;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
 .tab-link:hover {
-    background-color: #848484;
+    background: #0056b3;
 }
 
-/* Estilo para as abas */
+/* Abas */
 .tab-content {
-    display: none; /* Todas as abas começam ocultas */
+    display: none;
     padding: 20px;
 }
 
 #itens {
-    display: block; /* Exibe a aba "itens" por padrão */
+    display: block;
 }
 
-/* Estilo do Popup */
-.popUp {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
-.popUp-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 5px;
-    width: 80%;
-    max-width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
+th {
+    background-color: #f8f9fa;
     font-weight: bold;
+}
+
+/* Inputs */
+input, button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background: #007bff;
+    color: white;
     cursor: pointer;
 }
 
-.close:hover {
-    color: black;
+button:hover {
+    background: #0056b3;
+}
+
+/* Responsividade básica */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    #titulo h1 {
+        font-size: 28px;
+    }
 }
 
 /* Estilos para o formulário */
@@ -239,7 +211,7 @@ th {
 /* MOSTRA OS TÍTULOS DE SEPARAÇÃO */
 .titulo-separacao,
 .titulo-separacao * {
-    visibility: visible !important;
+    visibility: visible;
 }
 
 /* Estilo para o seletor de separação */
@@ -280,15 +252,15 @@ th {
 }
 
 .separacao-selector button {
-        padding: 10px 20px;
-    color: white;
+    padding: 10px;
+    background: #007bff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .separacao-selector button:hover {
-    background-color: #848484;
+    background: #0056b3;
 }
 
 /* Estilo para o seletor de kit */
@@ -591,13 +563,6 @@ td {
     border-radius: 16px;
 }
 
-/* ============================= */
-/* RODAPÉ */
-/* ============================= */
-footer {
-    color: var(--texto-secundario);
-}
-
 /* Separação visual entre kits e produtos */
 .linha-kit {
     background-color: rgba(0, 150, 255, 0.12);
@@ -620,10 +585,12 @@ footer {
 
     .no-print,
     button,
-    input,
+    input:not([type="checkbox"]),
     .menu,
-    .tab-link {
-        display: none !important;
+    .tab-link,
+    #titulo,
+    footer {
+        display: none;
     }
 
     html, body {
@@ -674,19 +641,6 @@ footer {
 
 .kit-produto .col-desc {
     padding-left: 24px;
-}
-
-.tab-link {
-    padding: 10px 20px;
-    background-color: #0000008f;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.tab-link:hover {
-    background-color: #848484;
 }
 
 /* Estilo para as abas */
@@ -763,18 +717,6 @@ form button {
 
 form button:hover {
     background-color: #2980b9;
-}
-
-/* Estilos para a tabela */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
 }
 
 th {
@@ -875,7 +817,7 @@ footer {
 /* MOSTRA OS TÍTULOS DE SEPARAÇÃO */
 .titulo-separacao,
 .titulo-separacao * {
-    visibility: visible !important;
+    visibility: visible;
 }
 
 /* Estilo para o seletor de separação */
@@ -916,7 +858,8 @@ footer {
 }
 
 .separacao-selector button {
-        padding: 10px 20px;
+    padding: 10px;
+    background: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -924,7 +867,7 @@ footer {
 }
 
 .separacao-selector button:hover {
-    background-color: #848484;
+    background: #0056b3;
 }
 
 /* Estilo para o seletor de kit */
@@ -1247,13 +1190,6 @@ tr.editando {
     border-radius: 16px;
 }
 
-/* ============================= */
-/* RODAPÉ */
-/* ============================= */
-footer {
-    color: var(--texto-secundario);
-}
-
 /* Separação visual entre kits e produtos */
 .linha-kit {
     background-color: rgba(0, 150, 255, 0.12);
@@ -1263,40 +1199,6 @@ footer {
 .linha-produto {
     background-color: rgba(0, 255, 150, 0.12);
     border-top: 1px dashed #00aa77;
-}
-
-/* Não aparece na tela */
-@media screen {
-    .print-only {
-        display: none;
-    }
-}
-
-@media print {
-
-    .no-print,
-    button,
-    input,
-    .menu,
-    .tab-link {
-        display: none !important;
-    }
-
-    html, body {
-        height: auto;
-        overflow: visible;
-        background: white;
-        color: black;
-    }
-
-    table,
-    tr {
-        page-break-inside: avoid;
-    }
-
-    .print-only {
-        display: block;
-    }
 }
 
 #separacao {
@@ -1309,36 +1211,33 @@ footer {
 
 /* TÍTULOS */
 .titulo-separacao {
-    font-size: 15px;
-    font-weight: bold;
-    margin: 18px 0 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #000;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--azul-claro);
+    color: var(--texto-principal);
 }
 
 /* TABELA */
 .tabela-separacao {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
-    table-layout: fixed; /* 🔴 IMPORTANTE */
 }
 
 /* CABEÇALHO */
 .tabela-separacao th {
-    background: #f3f3f3;
-    border-bottom: 1px solid #000;
-    padding: 5px 6px;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ddd;
     text-align: left;
-    white-space: nowrap;
 }
 
 /* CÉLULAS */
 .tabela-separacao td {
-    border-bottom: 1px solid #ddd;
-    padding: 4px 6px;
-    vertical-align: middle;
-    line-height: 1.2;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
 }
 
 /* LARGURAS FIXAS (ALINHAMENTO PERFEITO) */
@@ -1365,7 +1264,7 @@ footer {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.7);
     display: none;
     align-items: center;
     justify-content: center;
@@ -1373,10 +1272,14 @@ footer {
 }
 
 .modal-box {
-    background: #ffffff;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     width: 420px;
     padding: 16px;
-    border-radius: 6px;
+    border-radius: 14px;
     font-family: Arial, sans-serif;
 }
 
@@ -1420,6 +1323,38 @@ footer {
     border: none;
 }
 
+/* MODAL SELEÇÃO */
+#searchSelecao {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#listaSelecao {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.item-selecao {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.item-selecao:hover {
+    background-color: #f5f5f5;
+}
+
+.item-selecao:last-child {
+    border-bottom: none;
+}
+
 /* KIT */
 .kit-row td {
     background: #ecfdf5;
@@ -1443,4 +1378,297 @@ footer {
 /* AVULSOS */
 #separacaoAvulsosBody tr td {
     background: #eff6ff;
+}
+
+/* Glassmorphism overrides */
+.tab-content {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+.popUp-content {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 14px;
+}
+
+a.tab-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+a.tab-link.active {
+    background-color: var(--azul-claro);
+    color: white;
+}
+/* Padroniza��o de bot�es */
+button {
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+}
+
+/* Padroniza��o de inputs */
+input, textarea {
+    padding: 10px;
+    font-size: 16px;
+}
+
+@media print {
+    input[type="checkbox"] {
+        display: inline;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+}
+
+/* Melhorias nas tabelas */
+table {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+th, td {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--texto-principal);
+}
+
+/* Melhorias em inputs e bot�es */
+input, textarea {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+input:focus, textarea:focus {
+    border-color: var(--azul-claro);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,163,226,0.1);
+}
+button {
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 24px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    font-size: 14px;
+    color: var(--texto-secundario);
+}
+
+/* Melhorias no conte�do das abas */
+.tab-content {
+    padding: 24px;
+}
+.tab-content p {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--texto-principal);
+}
+
+@media print {
+    body {
+        margin: 0;
+        font-size: 12px;
+    }
+    .tab-content {
+        padding: 8px;
+        box-shadow: none;
+    }
+    table {
+        font-size: 11px;
+        margin: 8px 0;
+        box-shadow: none;
+    }
+    th, td {
+        padding: 4px 6px;
+    }
+    h1, h2, h3 {
+        font-size: 14px;
+        margin: 8px 0 4px;
+    }
+    .titulo-separacao {
+        font-size: 12px;
+        margin: 12px 0 6px;
+    }
+    * {
+        box-shadow: none !important;
+    }
+}
+
+/* Alinhamento de �cones */
+.tab-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tab-link span {
+    font-size: 20px;
+}
+
+/* Organiza��o da p�gina de importa��o */
+#importar .import-section {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+#importar .import-section button {
+    width: fit-content;
+}
+#importar #arquivoSelecionado {
+    font-size: 14px;
+    color: var(--texto-secundario);
+    margin-left: 12px;
+}
+#importar #importStatus {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+#importar .import-section:nth-child(2) {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#importar .import-section {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#importar .import-section:nth-child(2) {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#importar .import-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--texto-principal);
+}
+
+#importar .import-section p {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: var(--texto-secundario);
+    line-height: 1.4;
+}
+
+/* Bloquear scroll quando modal aberto */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Pagina��o */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0;
+    padding: 15px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+}
+
+.pagination button {
+    padding: 10px 16px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pagination button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.pagination button.active {
+    background: var(--azul-claro);
+    color: white;
+    border-color: var(--azul-claro);
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    background: rgba(200, 200, 200, 0.5);
+}
+
+.pagination button:first-child,
+.pagination button:last-child {
+    font-weight: 600;
+    min-width: 100px;
+}
+
+/* SEPARAÇÃO - SELECTOR SIMPLES */
+.separacao-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.separacao-selector input[type="text"],
+.separacao-selector input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.separacao-selector button {
+    padding: 10px;
+    background: #004e9b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.separacao-selector button:hover {
+    background: #183264;
 }

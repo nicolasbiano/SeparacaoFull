@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&family=Dongle&family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
@@ -164,28 +165,26 @@
         <div id="separacao" class="tab-content" style="display: none;">
             <p>Separação de Produtos</p>
             
-            <div class="no-print">
+            <div class="separacao-header no-print">
                 <button type="button" id="printSeparacao" onclick="window.print()">Imprimir Lista Produtos</button>
-            </div>
-
-            <h2 id="displayPedido" class="print-only"></h2>
-
-            <div class="separacao-selector no-print">
-                <datalist id="datalistSeparacao"></datalist>
-                <input type="text" id="inputSeparacao" list="datalistSeparacao" placeholder="Buscar e selecionar kit ou produto">
-                <input type="number" id="qtdSeparacao" value="1" min="1">
-                <button type="button" onclick="adicionarSeparacao()">Adicionar</button>
+                <div class="separacao-selector">
+                    <button type="button" onclick="abrirModalSelecao()" id="btnSelecionar">
+                        <span id="selecaoDisplay">Selecionar Produto ou Kit</span>
+                    </button>
+                    <input type="number" id="qtdSeparacao" value="1" min="1">
+                    <button type="button" onclick="adicionarSeparacao()">Adicionar</button>
+                </div>
             </div>
                 <h3 class="titulo-separacao">KITS</h3>
                     <table class="tabela-separacao">
                         <thead>
                             <tr>
-                                <th class="col-sku">SKU</th>
-                                <th class="col-desc">Descrição</th>
-                                <th class="col-full">Código Full</th>
-                                <th class="col-qtd">Qtd</th>
-                                <th class="col-obs">Obs</th>
-                                <th class="no-print col-acoes">Ações</th>
+                                <th>SKU</th>
+                                <th>Descrição</th>
+                                <th>Código Full</th>
+                                <th>Qtd</th>
+                                <th>Obs</th>
+                                <th class="no-print">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="separacaoKitsBody"></tbody>
@@ -198,12 +197,12 @@
                     <table class="tabela-separacao">
                         <thead>
                             <tr>
-                                <th class="col-sku">SKU</th>
-                                <th class="col-desc">Descrição</th>
-                                <th class="col-full">Código Full</th>
-                                <th class="col-qtd">Qtd</th>
-                                <th class="col-obs">Obs</th>
-                                <th class="no-print col-acoes">Ações</th>
+                                <th>SKU</th>
+                                <th>Descrição</th>
+                                <th>Código Full</th>
+                                <th>Qtd</th>
+                                <th>Obs</th>
+                                <th class="no-print">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="separacaoAvulsosBody"></tbody>
@@ -239,6 +238,17 @@
     </div>
 </div>
 
+            <!-- MODAL SELEÇÃO PRODUTO/KIT -->
+            <div id="modalSelecao" class="modal-overlay">
+                <div class="modal-box">
+                    <h3>Selecionar Produto ou Kit</h3>
+                    <input type="text" id="searchSelecao" placeholder="Buscar...">
+                    <div id="listaSelecao"></div>
+                    <div class="modal-botoes">
+                        <button onclick="fecharModalSelecao()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
 
         <!-- Aba Relatórios -->
         <div id="relatorios" class="tab-content" style="display: none;">
@@ -265,11 +275,22 @@
         <div id="importar" class="tab-content" style="display: none;">
             <p>Importar Produtos</p>
             <p>Use a planilha modelo para facilitar o preenchimento.</p>
-            <button type="button" id="downloadTemplateButton">Baixar Modelo CSV</button><br><br>
-            <input type="file" id="csvFileInput" accept=".csv" hidden>
-            <button type="button" class="btnImportar"onclick="document.getElementById('csvFileInput').click()">Importar CSV</button>
-            <span id="arquivoSelecionado">Nenhum arquivo selecionado</span>
-            <button type="button" id="uploadButton">Upload e Importar</button>
+
+            <div class="import-section">
+                <h3>Baixar Modelo</h3>
+                <p>Baixe o modelo CSV para preencher corretamente os dados dos produtos.</p>
+                <button type="button" id="downloadTemplateButton">Baixar Modelo CSV</button>
+            </div>
+
+            <div class="import-section">
+                <h3>Importar Arquivo</h3>
+                <p>Selecione o arquivo CSV preenchido e faça o upload para importar os produtos.</p>
+                <input type="file" id="csvFileInput" accept=".csv" hidden>
+                <button type="button" class="btnImportar" onclick="document.getElementById('csvFileInput').click()">Selecionar CSV</button>
+                <span id="arquivoSelecionado">Nenhum arquivo selecionado</span>
+                <button type="button" id="uploadButton">Upload e Importar</button>
+            </div>
+
             <div id="importStatus"></div>
         </div>
 
@@ -284,6 +305,68 @@
     <!-- Firebase Firestore -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
+    <!-- Modal functions (defined here to work even if module fails) -->
+    <script>
+        // Global variables for modal
+        window.selecaoAtual = null;
+
+        function abrirModalSelecao() {
+            const modal = document.getElementById("modalSelecao");
+            if (!modal) return;
+            modal.style.display = "flex";
+            document.body.classList.add('modal-open');
+            
+            // Clear search
+            const searchInput = document.getElementById("searchSelecao");
+            if (searchInput) searchInput.value = "";
+            
+            // Populate list (will be empty if data not loaded, but modal works)
+            popularListaSelecao();
+            
+            // Focus on search
+            if (searchInput) searchInput.focus();
+            
+            // Close on outside click
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    fecharModalSelecao();
+                }
+            };
+        }
+
+        function fecharModalSelecao() {
+            const modal = document.getElementById("modalSelecao");
+            if (modal) modal.style.display = "none";
+            document.body.classList.remove('modal-open');
+        }
+
+        function popularListaSelecao() {
+            const lista = document.getElementById("listaSelecao");
+            if (!lista) return;
+            
+            const search = document.getElementById("searchSelecao")?.value.toLowerCase() || "";
+            
+            // This will be empty if data not loaded, but modal opens
+            let html = "<div style='padding: 10px; color: #666;'>Pesquise por algum Produto...</div>";
+            lista.innerHTML = html;
+        }
+
+        function selecionarItem(sku) {
+            window.selecaoAtual = sku;
+            
+            // Update button display
+            const display = document.getElementById("selecaoDisplay");
+            if (display) {
+                if (sku.startsWith("KIT:")) {
+                    display.textContent = `KIT: ${sku.replace("KIT:", "")}`;
+                } else {
+                    display.textContent = sku;
+                }
+            }
+            
+            fecharModalSelecao();
+        }
+    </script>
 
     <script type="module" src="script.js"></script>
 </body>

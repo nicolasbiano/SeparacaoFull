@@ -31,6 +31,8 @@ let kits = [];
 let separacao = [];
 let editandoSeparacaoIndex = null;
 let historico = [];
+let currentPageProdutos = 1;
+let currentPageKits = 1;
 
 // ===============================
 // PESQUISA DE PRODUTOS
@@ -47,7 +49,8 @@ if (inputPesquisaProdutos) {
             (p.codigoFull || "").toLowerCase().includes(termo)
         );
 
-        renderProdutos(filtrados);
+        currentPageProdutos = 1;
+        renderProdutos(filtrados, currentPageProdutos);
     });
 }
 
@@ -66,20 +69,30 @@ if (inputPesquisaKits) {
             (k.codigoFull || "").toLowerCase().includes(termo)
         );
 
-        renderKits(filtrados);
+        currentPageKits = 1;
+        renderKits(filtrados, currentPageKits);
     });
+}
+
+// ===============================
+// PESQUISA MODAL SELEÇÃO
+// ===============================
+const searchSelecao = document.getElementById("searchSelecao");
+
+if (searchSelecao) {
+    searchSelecao.addEventListener("input", popularListaSelecao);
 }
 
 async function carregarProdutos() {
     const snapshot = await getDocs(produtosCol);
     produtos = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderProdutos();
+    renderProdutos(produtos, currentPageProdutos);
 }
 
 async function carregarKits() {
     const snapshot = await getDocs(kitsCol);
     kits = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderKits();
+    renderKits(kits, currentPageKits);
 }
 
 async function carregarHistorico() {
@@ -107,7 +120,6 @@ const inputProdutoKit = document.getElementById("inputProdutoKit");
 const qtdProdutoKit = document.getElementById("qtdProdutoKit");
 const itensSelecionadosKit = document.getElementById("itensSelecionadosKit");
 // === INPUTS SEPARAÇÃO ===
-const inputSeparacao = document.getElementById("inputSeparacao");
 const qtdSeparacao = document.getElementById("qtdSeparacao");
 // === TABELAS ===
 const productTableBody = document.getElementById("productTableBody");
@@ -121,22 +133,24 @@ const popupCadastroKit = document.getElementById("popupCadastroKit");
 const newKitForm = document.getElementById("newKitForm");
 
 const datalistProdutosKit = document.getElementById("datalistProdutosKit");
-const datalistSeparacao = document.getElementById("datalistSeparacao");
 
 /***********************
  * POPUPS
  ***********************/
 function openPopUp() {
     popupCadastroItem.style.display = "block";
+    document.body.classList.add('modal-open');
 }
 function closePopup() {
     popupCadastroItem.style.display = "none";
     document.getElementById("newItemForm").reset();
+    document.body.classList.remove('modal-open');
 }
 
 function openKitPopUp() {
     popupCadastroKit.style.display = "block";
     atualizarDatalistProdutosKit();
+    document.body.classList.add('modal-open');
 }
 function closeKitPopUp() {
     popupCadastroKit.style.display = "none";
@@ -144,6 +158,7 @@ function closeKitPopUp() {
     itensKit = [];
     editandoKit = null;
     renderItensKit();
+    document.body.classList.remove('modal-open');
 }
 
 /***********************
@@ -172,7 +187,7 @@ function showTab(id, btn) {
     document.querySelectorAll(".tab-link").forEach(b => b.classList.remove("active"));
     if (btn) btn.classList.add("active");
 
-    if (id === "separacao") preencherDatalistSeparacao();
+    // Removed preencherDatalistSeparacao call since datalist was removed
 }
 
 /***********************
@@ -194,22 +209,127 @@ async function salvarTodosProdutosFirebase() {
     }
 }
 
-function renderProdutos(lista = produtos) {
-    productTableBody.innerHTML = "";
-    lista.forEach((p, i) => {
-        productTableBody.innerHTML += `
-        <tr>
-            <td>${p.sku}</td>
-            <td>${p.nome}</td>
-            <td>${p.codigoFull || ""}</td>
-            <td>${p.localizacao}</td>
-            <td>${p.estoque}</td>
-            <td>
-                <button onclick="editarProduto(${i})">Editar</button>
-                <button onclick="excluirProduto(${i})">Excluir</button>
-            </td>
-        </tr>`;
+// ===============================
+// FUNÇÃO GENÉRICA PARA RENDERIZAR TABELAS
+// ===============================
+function renderTable(tableBody, lista, page, itemsPerPage, columns, actions) {
+    const totalPages = Math.ceil(lista.length / itemsPerPage);
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = lista.slice(start, end);
+
+    tableBody.innerHTML = "";
+    pageItems.forEach((item, i) => {
+        const globalIndex = lista.indexOf(item);
+        let rowHtml = "<tr>";
+
+        columns.forEach(col => {
+            rowHtml += `<td>${item[col] || ""}</td>`;
+        });
+
+        if (actions) {
+            rowHtml += `<td>${actions(globalIndex)}</td>`;
+        }
+
+        rowHtml += "</tr>";
+        tableBody.innerHTML += rowHtml;
     });
+
+    return totalPages;
+}
+
+function renderProdutos(lista = produtos, page = 1) {
+    const itemsPerPage = 15;
+    const columns = ["sku", "nome", "codigoFull", "localizacao", "estoque"];
+    const actions = (index) => `
+        <button onclick="editarProduto(${index})">Editar</button>
+        <button onclick="excluirProduto(${index})">Excluir</button>
+    `;
+
+    const totalPages = renderTable(productTableBody, lista, page, itemsPerPage, columns, actions);
+    renderPagination('produtos', totalPages, page);
+}
+
+function renderKits(lista = kits, page = 1) {
+    const itemsPerPage = 15;
+    const columns = ["sku", "nome", "codigoFull"];
+    const actions = (index) => `
+        <button onclick="editarKit(${index})">Editar</button>
+        <button onclick="excluirKit(${index})">Excluir</button>
+    `;
+
+    const totalPages = renderTable(kitTableBody, lista, page, itemsPerPage, columns, actions);
+    renderPagination('kits', totalPages, page);
+}
+
+function renderPagination(type, totalPages, currentPage) {
+    const containerId = type === 'produtos' ? 'itens' : 'kits';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Remove existing pagination
+    const existing = container.querySelector('.pagination');
+    if (existing) existing.remove();
+
+    if (totalPages <= 1) return;
+
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = 'pagination';
+
+    // Botão Anterior
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '◀ Anterior';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => changePage(type, currentPage - 1);
+    paginationDiv.appendChild(prevBtn);
+
+    // Botões numéricos (limitando a exibição)
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = i === currentPage ? 'active' : '';
+        btn.onclick = () => changePage(type, i);
+        paginationDiv.appendChild(btn);
+    }
+
+    // Botão Próximo
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = 'Próximo ▶';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => changePage(type, currentPage + 1);
+    paginationDiv.appendChild(nextBtn);
+
+    container.appendChild(paginationDiv);
+}
+
+function changePage(type, page) {
+    if (type === 'produtos') {
+        currentPageProdutos = page;
+        const termo = inputPesquisaProdutos?.value.toLowerCase() || '';
+        const lista = termo ? produtos.filter(p =>
+            p.sku.toLowerCase().includes(termo) ||
+            p.nome.toLowerCase().includes(termo) ||
+            (p.codigoFull || "").toLowerCase().includes(termo)
+        ) : produtos;
+        renderProdutos(lista, page);
+    } else {
+        currentPageKits = page;
+        const termo = inputPesquisaKits?.value.toLowerCase() || '';
+        const lista = termo ? kits.filter(k =>
+            k.sku.toLowerCase().includes(termo) ||
+            k.nome.toLowerCase().includes(termo) ||
+            (k.codigoFull || "").toLowerCase().includes(termo)
+        ) : kits;
+        renderKits(lista, page);
+    }
 }
 
 
@@ -228,7 +348,7 @@ document.getElementById("newItemForm").addEventListener("submit", async (e) => {
         await salvarProdutoFirebase(novoProduto);
 
         produtos.push(novoProduto);
-        renderProdutos();
+        renderProdutos(produtos, currentPageProdutos);
         closePopup();
 
         console.log("Produto salvo com sucesso:", novoProduto);
@@ -259,7 +379,7 @@ async function excluirProduto(i) {
     }
 
     produtos.splice(i, 1);
-    renderProdutos();
+    renderProdutos(produtos, currentPageProdutos);
 }
 
 
@@ -320,7 +440,7 @@ newKitForm.addEventListener("submit", async e => {
     if (editandoKit !== null) kits[editandoKit] = kit;
     else kits.push(kit);
 
-    renderKits();
+    renderKits(kits, currentPageKits);
     closeKitPopUp();
 });
 
@@ -332,22 +452,6 @@ newKitForm.addEventListener("submit", async e => {
         const docRef = await addDoc(kitsCol, kit);
         kit.id = docRef.id;
     }
-}
-
-function renderKits() {
-    kitTableBody.innerHTML = "";
-    kits.forEach((k, i) => {
-        kitTableBody.innerHTML += `
-        <tr>
-            <td>${k.sku}</td>
-            <td>${k.nome}</td>
-            <td>${k.codigoFull || ""}</td>
-            <td>
-                <button onclick="editarKit(${i})">Editar</button>
-                <button onclick="excluirKit(${i})">Excluir</button>
-            </td>
-        </tr>`;
-    });
 }
 
 async function excluirKit(index) {
@@ -372,7 +476,7 @@ async function excluirKit(index) {
     // Remove do array local
     kits.splice(index, 1);
 
-    renderKits();
+    renderKits(kits, currentPageKits);
     renderSeparacao();
 }
 
@@ -390,18 +494,12 @@ function editarKit(i) {
 /***********************
  * SEPARAÇÃO (CORRIGIDA SEM REMOVER NADA)
  ***********************/
-function preencherDatalistSeparacao() {
-    datalistSeparacao.innerHTML = "";
-    produtos.forEach(p => datalistSeparacao.append(new Option(p.sku, p.sku)));
-    kits.forEach(k => datalistSeparacao.append(new Option(`KIT:${k.sku}`, `KIT:${k.sku}`)));
-}
-
 async function adicionarSeparacao() {
-    const valor = inputSeparacao.value.trim();
+    const valor = window.selecaoAtual;
     const qtd = Number(qtdSeparacao.value);
 
     if (!valor || qtd <= 0) {
-        alert("Dados inválidos");
+        alert("Selecione um produto ou kit primeiro");
         return;
     }
 
@@ -424,8 +522,9 @@ async function adicionarSeparacao() {
     }
 
 
-    inputSeparacao.value = "";
+    window.selecaoAtual = null;
     qtdSeparacao.value = 1;
+    document.getElementById("selecaoDisplay").textContent = "Selecionar Produto ou Kit";
     renderSeparacao();
     await salvarSeparacaoFirebase();
 }
@@ -532,6 +631,7 @@ function editarSeparacao(index) {
     document.getElementById("editObs").value = isKit ? "KIT" : "";
 
     document.getElementById("modalEditar").style.display = "flex";
+    document.body.classList.add('modal-open');
 }
 
 function salvarEdicao() {
@@ -585,6 +685,86 @@ function salvarEdicao() {
 
 function fecharModal() {
     document.getElementById("modalEditar").style.display = "none";
+    document.body.classList.remove('modal-open');
+}
+
+/***********************
+ * MODAL SELEÇÃO PRODUTO/KIT
+ ***********************/
+function abrirModalSelecao() {
+    const modal = document.getElementById("modalSelecao");
+    modal.style.display = "flex";
+    document.body.classList.add('modal-open');
+    
+    // Limpar busca
+    document.getElementById("searchSelecao").value = "";
+    popularListaSelecao();
+    
+    // Focar no campo de busca
+    document.getElementById("searchSelecao").focus();
+    
+    // Fechar modal ao clicar fora
+    modal.onclick = function(event) {
+        if (event.target === modal) {
+            fecharModalSelecao();
+        }
+    };
+}
+
+function fecharModalSelecao() {
+    document.getElementById("modalSelecao").style.display = "none";
+    document.body.classList.remove('modal-open');
+}
+
+function popularListaSelecao() {
+    const lista = document.getElementById("listaSelecao");
+    const search = document.getElementById("searchSelecao").value.toLowerCase();
+    
+    let html = "";
+    
+    // Adicionar kits
+    kits.forEach(kit => {
+        if (search === "" || 
+            kit.sku.toLowerCase().includes(search) || 
+            kit.nome.toLowerCase().includes(search) ||
+            (kit.codigoFull || "").toLowerCase().includes(search)) {
+            html += `<div class="item-selecao" data-sku="KIT:${kit.sku}" onclick="selecionarItem(this.dataset.sku)">
+                <strong>KIT: ${kit.sku}</strong> - ${kit.nome} ${kit.codigoFull ? `(${kit.codigoFull})` : ''}
+            </div>`;
+        }
+    });
+    
+    // Adicionar produtos
+    produtos.forEach(prod => {
+        if (search === "" || 
+            prod.sku.toLowerCase().includes(search) || 
+            prod.nome.toLowerCase().includes(search) ||
+            (prod.codigoFull || "").toLowerCase().includes(search)) {
+            html += `<div class="item-selecao" data-sku="${prod.sku}" onclick="selecionarItem(this.dataset.sku)">
+                <strong>${prod.sku}</strong> - ${prod.nome} ${prod.codigoFull ? `(${prod.codigoFull})` : ''}
+            </div>`;
+        }
+    });
+    
+    lista.innerHTML = html;
+}
+
+function selecionarItem(sku) {
+    // Armazenar o SKU selecionado
+    window.selecaoAtual = sku;
+    
+    // Atualizar display do botão
+    const display = document.getElementById("selecaoDisplay");
+    if (sku.startsWith("KIT:")) {
+        const kitSku = sku.replace("KIT:", "");
+        const kit = kits.find(k => k.sku === kitSku);
+        display.textContent = `KIT: ${kit ? kit.nome : kitSku}`;
+    } else {
+        const prod = produtos.find(p => p.sku === sku);
+        display.textContent = prod ? prod.nome : sku;
+    }
+    
+    fecharModalSelecao();
 }
 
 /***********************
@@ -639,7 +819,7 @@ function renderRelatorioProdutos(dados) {
                     <td>${p?.nome || "NÃO CADASTRADO"}</td>
                     <td>${p?.localizacao || ""}</td>
                     <td>${qtd}</td>
-                    <td>${p ? "SIM" : "NÃO"}</td>
+                    <td><input type="checkbox"></td>
                 </tr>
             `;
         });
@@ -682,6 +862,7 @@ document.getElementById("uploadButton").onclick = () => {
             .slice(1); // remove cabeçalho
 
         let novos = 0;
+        let atualizados = 0;
 
         for (const l of linhas) {
             if (!l.trim()) continue;
@@ -692,30 +873,42 @@ document.getElementById("uploadButton").onclick = () => {
 
             if (!sku || !nome || !localizacao || isNaN(estoque)) continue;
 
-            if (produtos.some(p => p.sku === sku.trim())) continue;
+            const existingIndex = produtos.findIndex(p => p.sku === sku.trim());
 
-            const produto = {
-                sku: sku.trim(),
-                nome: nome.trim(),
-                codigoFull: codigoFull.trim(),
-                localizacao: localizacao.trim(),
-                estoque: Number(estoque)
-            };
+            if (existingIndex !== -1) {
+                // Atualiza localização e estoque do produto existente
+                produtos[existingIndex].localizacao = localizacao.trim();
+                produtos[existingIndex].estoque = Number(estoque);
+                await salvarProdutoFirebase(produtos[existingIndex]);
+                atualizados++;
+            } else {
+                // Adiciona novo produto
+                const produto = {
+                    sku: sku.trim(),
+                    nome: nome.trim(),
+                    codigoFull: codigoFull.trim(),
+                    localizacao: localizacao.trim(),
+                    estoque: Number(estoque)
+                };
 
-            await salvarProdutoFirebase(produto);
-            novos++;
+                await salvarProdutoFirebase(produto);
+                novos++;
+            }
         }
 
-        // RECARREGA TUDO DO FIRESTORE
+        // ATUALIZA UI IMEDIATAMENTE
+        renderProdutos(produtos, currentPageProdutos);
+        atualizarDatalistProdutosKit();
+
+        // RECARREGA TUDO DO FIRESTORE (para sincronizar)
         await carregarProdutos();
 
-        // ATUALIZA DATALISTS
+        // ATUALIZA DATALISTS NOVAMENTE SE NECESSÁRIO
         atualizarDatalistProdutosKit();
-        preencherDatalistSeparacao();
 
         btnRemoverArquivo.onclick();
 
-        alert(`${novos} produtos importados com sucesso`);
+        alert(`${novos} produtos importados e ${atualizados} produtos atualizados com sucesso`);
     };
 
     reader.readAsText(file, "UTF-8");
@@ -774,6 +967,5 @@ window.fecharModal = fecharModal;
 
     // 🔥 RESTAURA SEPARAÇÃO
     separacao = await carregarSeparacaoFirebase();
-    preencherDatalistSeparacao();
     renderSeparacao();
 })();
