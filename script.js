@@ -33,6 +33,7 @@ let editandoSeparacaoIndex = null;
 let historico = [];
 let currentPageProdutos = 1;
 let currentPageKits = 1;
+let produtoEditandoId = null;
 
 // ===============================
 // PESQUISA DE PRODUTOS
@@ -220,7 +221,6 @@ function renderTable(tableBody, lista, page, itemsPerPage, columns, actions) {
 
     tableBody.innerHTML = "";
     pageItems.forEach((item, i) => {
-        const globalIndex = lista.indexOf(item);
         let rowHtml = "<tr>";
 
         columns.forEach(col => {
@@ -228,7 +228,7 @@ function renderTable(tableBody, lista, page, itemsPerPage, columns, actions) {
         });
 
         if (actions) {
-            rowHtml += `<td>${actions(globalIndex)}</td>`;
+            rowHtml += `<td>${actions(item)}</td>`;
         }
 
         rowHtml += "</tr>";
@@ -241,9 +241,9 @@ function renderTable(tableBody, lista, page, itemsPerPage, columns, actions) {
 function renderProdutos(lista = produtos, page = 1) {
     const itemsPerPage = 15;
     const columns = ["sku", "nome", "codigoFull", "localizacao", "estoque"];
-    const actions = (index) => `
-        <button onclick="editarProduto(${index})">Editar</button>
-        <button onclick="excluirProduto(${index})">Excluir</button>
+    const actions = (item) => `
+        <button onclick="editarProduto('${item.sku}')">Editar</button>
+        <button onclick="excluirProduto('${item.sku}')">Excluir</button>
     `;
 
     const totalPages = renderTable(productTableBody, lista, page, itemsPerPage, columns, actions);
@@ -253,9 +253,9 @@ function renderProdutos(lista = produtos, page = 1) {
 function renderKits(lista = kits, page = 1) {
     const itemsPerPage = 15;
     const columns = ["sku", "nome", "codigoFull"];
-    const actions = (index) => `
-        <button onclick="editarKit(${index})">Editar</button>
-        <button onclick="excluirKit(${index})">Excluir</button>
+    const actions = (item) => `
+        <button onclick="editarKit('${item.sku}')">Editar</button>
+        <button onclick="excluirKit('${item.sku}')">Excluir</button>
     `;
 
     const totalPages = renderTable(kitTableBody, lista, page, itemsPerPage, columns, actions);
@@ -332,12 +332,11 @@ function changePage(type, page) {
     }
 }
 
-
 document.getElementById("newItemForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     try {
-        const novoProduto = {
+        const produto = {
             sku: sku.value.trim(),
             nome: nomeProduto.value.trim(),
             codigoFull: codigoFull.value.trim(),
@@ -345,40 +344,56 @@ document.getElementById("newItemForm").addEventListener("submit", async (e) => {
             estoque: Number(estoque.value)
         };
 
-        await salvarProdutoFirebase(novoProduto);
+        if (produtoEditandoId) {
+            produto.id = produtoEditandoId;
 
-        produtos.push(novoProduto);
+            const index = produtos.findIndex(p => p.id === produtoEditandoId);
+            if (index !== -1) produtos[index] = produto;
+
+            await salvarProdutoFirebase(produto);
+        } else {
+            await salvarProdutoFirebase(produto);
+            produtos.push(produto);
+        }
+
+        produtoEditandoId = null;
+
         renderProdutos(produtos, currentPageProdutos);
+        atualizarDatalistProdutosKit();
         closePopup();
-
-        console.log("Produto salvo com sucesso:", novoProduto);
 
     } catch (erro) {
         console.error("ERRO AO SALVAR PRODUTO:", erro);
-        alert("Erro ao salvar produto. Veja o console (F12).");
+        alert("Erro ao salvar produto.");
     }
 });
 
-function editarProduto(i) {
-    const p = produtos[i];
+function editarProduto(skuSelecionado) {
+    const p = produtos.find(p => p.sku === skuSelecionado);
+    if (!p) return;
+
+    produtoEditandoId = p.id || null;
+
     sku.value = p.sku;
     nomeProduto.value = p.nome;
-    codigoFull.value = p.codigoFull;
+    codigoFull.value = p.codigoFull || "";
     localizacao.value = p.localizacao;
     estoque.value = p.estoque;
-    produtos.splice(i, 1);
+
     openPopUp();
 }
 
-async function excluirProduto(i) {
+
+async function excluirProduto(sku) {
     if (!confirm("Excluir produto?")) return;
 
-    const p = produtos[i];
+    const index = produtos.findIndex(p => p.sku === sku);
+    const p = produtos[index];
     if (p.id) {
         await deleteDoc(doc(db, "produtos", p.id));
     }
 
-    produtos.splice(i, 1);
+    produtos.splice(index, 1);
     renderProdutos(produtos, currentPageProdutos);
 }
 
@@ -454,7 +469,8 @@ newKitForm.addEventListener("submit", async e => {
     }
 }
 
-async function excluirKit(index) {
+async function excluirKit(sku) {
+    const index = kits.findIndex(k => k.sku === sku);
     const kit = kits[index];
 
     // Primeiro verifica se o kit está sendo usado na separação
@@ -480,13 +496,14 @@ async function excluirKit(index) {
     renderSeparacao();
 }
 
-function editarKit(i) {
-    const k = kits[i];
+function editarKit(sku) {
+    const index = kits.findIndex(k => k.sku === sku);
+    const k = kits[index];
     kitSku.value = k.sku;
     nomeKit.value = k.nome;
     kitCodigoFull.value = k.codigoFull;
     itensKit = [...k.itens];
-    editandoKit = i;
+    editandoKit = index;
     renderItensKit();
     openKitPopUp();
 }
